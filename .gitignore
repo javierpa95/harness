@@ -1,0 +1,102 @@
+# ==========================================
+# Dependencies
+# ==========================================
+node_modules/
+.pnp/
+.pnp.js
+.yarn/
+.turbo/
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
+
+# ==========================================
+# Build output
+# ==========================================
+dist/
+dist-ssr/
+.next/
+.out/
+build/
+*.local
+
+# ==========================================
+# Environment files (NEVER commit)
+# ==========================================
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.test
+
+# ==========================================
+# Database / Local data
+# ==========================================
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+pb_data/
+**/pb_data/
+data/
+**/data/
+
+# ==========================================
+# OS files
+# ==========================================
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+Icon?
+
+# ==========================================
+# IDE / Editor
+# ==========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# ==========================================
+# Logs
+# ==========================================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# ==========================================
+# Temporary files
+# ==========================================
+tmp/
+temp/
+*.tmp
+*.temp
+.cache/
+
+# ==========================================
+# Coverage / Test output
+# ==========================================
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+
+# ==========================================
+# opencode internal
+# ==========================================
+.opencode/node_modules/
+.opencode/bun.lock
+.opencode/plans/
+
+# ==========================================
+# Docker
+# ==========================================
+.dockerignore
+!/.dockerignore

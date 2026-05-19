@@ -1,0 +1,36 @@
+services:
+  backend:
+    image: [BACKEND_IMAGE]
+    container_name: [project]-backend
+    ports:
+      - "8090:8090"
+    volumes:
+      - backend_data:/data
+    environment:
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@localhost.com}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-changeme123}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8090/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: ../../.deploy/Dockerfile.web
+    container_name: [project]-web
+    ports:
+      - "4321:4321"
+    environment:
+      - BACKEND_URL=http://backend:8090
+      - SITE_URL=${SITE_URL:-http://localhost:4321}
+      - NODE_ENV=${NODE_ENV:-production}
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  backend_data:

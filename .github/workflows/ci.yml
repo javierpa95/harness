@@ -1,0 +1,42 @@
+name: Build Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: cd apps/web && npm install
+
+      - name: Build
+        run: cd apps/web && npm run build
+
+      # Add typecheck, lint, test steps as needed
+      # - name: Typecheck
+      #   run: cd apps/web && npm run typecheck
+
+      # - name: Lint
+      #   run: cd apps/web && npm run lint
+
+      # - name: Test
+      #   run: cd apps/web && npm test
+
+      - name: Security scan
+        run: |
+          if git grep -iE "password123|admin12345|secret_key|api_key" --cached > /dev/null 2>&1; then
+            echo "Potential secrets found!"
+            exit 1
+          fi

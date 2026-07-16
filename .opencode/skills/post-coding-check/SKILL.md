@@ -1,6 +1,9 @@
-# Post-Coding Check Skill
+---
+name: post-coding-check
+description: Use right after finishing a feature or bugfix, before committing. Runs the project's build/test/lint command and a quick credential grep — fast, not a full audit.
+---
 
-## Description
+# Post-Coding Check Skill
 
 Quick verification after coding sessions. Keep it fast.
 

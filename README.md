@@ -28,9 +28,23 @@ git clone <repo-url> my-project
 cd my-project
 ```
 
-### 2. Iniciar sesion con el agente
+### 2. Configurar el proyecto
 
-Al abrir el proyecto con opencode, el agente ejecutara automaticamente el flujo de **Project Clarification** (ver `AGENTS.md`):
+Dos formas, elige una — hacen lo mismo, `init.sh` es el camino recomendado porque no depende de que el agente tenga permiso de editar `.opencode/`:
+
+**Opcion A — script interactivo (recomendado):**
+
+```bash
+make init          # Linux/Mac/Git Bash, llama a init.sh
+# o en PowerShell nativo sin Git Bash:
+./init.ps1
+```
+
+Te pregunta nombre, descripcion, stack y tipo de proyecto; renombra `project-architect.md` al agente `[project]-architect` y actualiza `default_agent` en `.opencode/opencode.jsonc`.
+
+**Opcion B — dejar que el agente lo haga:**
+
+Al abrir el proyecto con opencode sin haber corrido `init.sh`, el agente ejecutara el flujo de **Project Clarification** (ver `AGENTS.md`):
 
 1. Define el **nombre** y **descripcion** del proyecto
 2. Elige el **stack** tecnologico (frontend, backend, database, deploy)
@@ -49,30 +63,40 @@ Una vez configurado, usa `/start` para cargar contexto y empieza a construir.
 
 | Agente | Funcion | Cuando usarlo |
 |--------|---------|---------------|
-| `[project]-architect` | Arquitecto principal (piensa, planifica) | Siempre — punto de entrada |
-| `frontend-guardian` | Analiza cambios en la capa UI | Si hay frontend |
-| `backend-guardian` | Analiza cambios en API/DB/auth | Si hay backend |
-| `gdpr-auditor` | Seguridad y privacidad basica | Si manejas datos de usuarios |
-| `release-manager` | Versionado y releases | Si necesitas control de versiones |
+| `[project]-architect` | Orquestador SDD (analiza, delega, decide) | Siempre — punto de entrada, `default_agent` |
+| `spec-writer` | Escribe/actualiza feature specs en `docs/features/` | Siempre, antes de implementar (salvo cambio trivial) |
+| `frontend-developer` | Implementa UI en `apps/web/`, sin TDD | Si hay frontend |
+| `backend-developer` | Implementa API/DB/auth con TDD (Red→Green→Refactor) | Si hay backend |
+| `code-reviewer` | Revisa la implementacion contra la spec, solo lectura | Cambios funcionales, antes de commit |
+| `gdpr-auditor` | Busca credenciales expuestas y anti-patrones de seguridad | Si manejas datos de usuarios, en paralelo con code-reviewer |
+| `release-manager` | Analiza el repo y recomienda versionado, no edita | Al preparar un release |
 
-### Flujo de trabajo
+### Flujo de trabajo (SDD + TDD)
 
 ```
-Usuario → [project]-architect (piensa y planifica)
+Usuario → project-architect analiza la peticion
               ↓
-         Delega a guardians (analizan riesgos)
+         spec-writer crea/actualiza la spec (docs/features/)
               ↓
-         Presenta plan al usuario
+         frontend-developer + backend-developer implementan
+         (backend con TDD; en paralelo si aplica)
               ↓
-         Usuario aprueba → cambia a build → ejecuta cambios
+         code-reviewer verifica contra la spec + tests
+         (+ gdpr-auditor en paralelo si hay datos sensibles)
+              ↓
+         project-architect decide: PASS → commit | FAIL → itera
 ```
 
-### Comandos
+Detalle completo del flujo, excepciones (cambio trivial, bug fix) y criterios de decision en `AGENTS.md` y `.opencode/agents/project-architect.md`.
+
+### Comandos y skills
 
 | Comando | Funcion |
 |---------|---------|
 | `/start` | Carga contexto completo al inicio de sesion |
 | `/end` | Persiste aprendizajes en `session-log.md` |
+
+Los 4 skills en `.opencode/skills/` (`git-advisor`, `post-coding-check`, `security-guard`, `docs-maintainer`) no se disparan solos — cualquier agente los invoca por nombre con la tool `skill` cuando el contexto encaja (ver la `description` de cada uno).
 
 ---
 
@@ -156,12 +180,14 @@ El template incluye configuracion Docker basica que puedes adaptar:
 
 ## Scripts
 
-| Archivo | Plataforma |
-|---------|------------|
-| `Makefile` | Linux/Mac/Git Bash |
-| `scripts/dev.ps1` | Windows PowerShell |
+| Archivo | Plataforma | Uso |
+|---------|------------|-----|
+| `init.sh` | Linux/Mac/Git Bash | Setup interactivo inicial (via `make init`) |
+| `init.ps1` | Windows PowerShell nativo | Lo mismo que `init.sh`, sin depender de bash |
+| `Makefile` | Linux/Mac/Git Bash | `make help` para ver todos los comandos |
+| `scripts/dev.ps1` | Windows PowerShell nativo | Equivalente a `make dev` |
 
-Ambos son templates — ajustar los comandos segun tu stack.
+Son templates — los comandos reales (`npm run dev`, `cd apps/web`, etc.) hay que ajustarlos al stack elegido tras el `init`.
 
 ---
 

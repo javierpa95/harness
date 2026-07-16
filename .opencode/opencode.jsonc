@@ -1,4 +1,6 @@
-﻿{
+{
+  // Un solo fichero de config (antes había opencode.json + opencode.jsonc,
+  // duplicados byte a byte — con jsonc alcanza, admite comentarios).
   "$schema": "https://opencode.ai/config.json",
   "permission": {
     "read": {
@@ -13,6 +15,12 @@
       "dist/*": "deny",
       "**/pb_data/*": "deny"
     },
+    // Red de seguridad por defecto para cualquier agente que no declare su
+    // propio permiso `edit`. Los agentes SÍ lo declaran (ver .opencode/agents/*.md)
+    // y ese permiso por-agente manda sobre este: project-architect tiene
+    // `edit: allow` sin restricciones y puede tocar .opencode/ igualmente
+    // (lo necesita en el Paso 4 del onboarding, aunque lo normal es que
+    // ./init.sh ya lo haya hecho antes de la primera sesión).
     "edit": {
       ".opencode/**/*": "deny",
       ".env*": "deny",

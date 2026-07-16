@@ -1,6 +1,7 @@
 # [PROJECT_NAME] - Makefile
 # The agent fills in actual commands during initialization.
-# Works on Windows (make via choco), Linux, Mac.
+# Works on Linux, Mac, and Windows via Git Bash (make ships a POSIX shell there).
+# Native PowerShell without Git Bash: use init.ps1 / scripts/dev.ps1 directly instead of make.
 
 .PHONY: help init dev install build test lint format typecheck check docker-up docker-down docker-logs docker-restart docker-build docker-clean check-secrets clean
 
@@ -14,33 +15,33 @@ BACKEND_DIR := services/backend
 # Help
 # ==========================================
 help: ## Show available commands
-	@echo [PROJECT_NAME] - Development Commands
-	@echo =====================================
-	@echo   make help          Show this message
-	@echo   make init          Initialize project (interactive)
-	@echo   make dev           Start development servers
-	@echo   make install       Install dependencies
-	@echo   make build         Build for production
-	@echo   make test          Run tests
-	@echo   make lint          Run linter
-	@echo   make format        Run formatter
-	@echo   make typecheck     Run type check
-	@echo   make check         Run all quality checks
-	@echo   make docker-up     Start all services
-	@echo   make docker-down   Stop all services
-	@echo   make docker-logs   Show service logs
-	@echo   make docker-restart Restart all services
-	@echo   make docker-build  Build Docker images
-	@echo   make docker-clean  Stop + remove containers/volumes
-	@echo   make check-secrets Scan for secrets
-	@echo   make clean         Remove build artifacts
+	@echo "[PROJECT_NAME] - Development Commands"
+	@echo "====================================="
+	@echo "  make help          Show this message"
+	@echo "  make init          Initialize project (interactive)"
+	@echo "  make dev           Start development servers"
+	@echo "  make install       Install dependencies"
+	@echo "  make build         Build for production"
+	@echo "  make test          Run tests"
+	@echo "  make lint          Run linter"
+	@echo "  make format        Run formatter"
+	@echo "  make typecheck     Run type check"
+	@echo "  make check         Run all quality checks"
+	@echo "  make docker-up     Start all services"
+	@echo "  make docker-down   Stop all services"
+	@echo "  make docker-logs   Show service logs"
+	@echo "  make docker-restart Restart all services"
+	@echo "  make docker-build  Build Docker images"
+	@echo "  make docker-clean  Stop + remove containers/volumes"
+	@echo "  make check-secrets Scan for secrets"
+	@echo "  make clean         Remove build artifacts"
 
 # ==========================================
 # Initialization
 # ==========================================
 init: ## Initialize project (interactive setup)
 	@echo Running project setup...
-	@if exist init.ps1 (powershell -ExecutionPolicy Bypass -File init.ps1) else (bash init.sh)
+	@bash init.sh
 
 # ==========================================
 # Development
@@ -119,6 +120,6 @@ check-secrets: ## Scan for secrets in staged files
 # ==========================================
 clean: ## Remove build artifacts and node_modules
 	@echo Cleaning...
-	@if exist $(WEB_DIR)\dist rmdir /s /q $(WEB_DIR)\dist
-	@if exist $(WEB_DIR)\node_modules rmdir /s /q $(WEB_DIR)\node_modules
+	@rm -rf $(WEB_DIR)/dist
+	@rm -rf $(WEB_DIR)/node_modules
 	@echo Clean complete

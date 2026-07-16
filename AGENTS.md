@@ -288,7 +288,7 @@ Antes de sugerir un `git commit`, asegurate de:
 - [ ] No has anadido archivos que deberian estar en `.gitignore`
 - [ ] El build funciona (`npm run build` o equivalente)
 - [ ] Si es un cambio user-facing: actualizaste `docs/CHANGELOG.md`
-- [ ] Estas en una rama `feature/` o `fix/`, NO en `main`
+- [ ] Si el proyecto es en equipo: estas en una rama `feature/` o `fix/`, NO en `main` (ver `.opencode/rules/git-workflow.md` — en solitario, commits directos a `main` son aceptables)
 - [ ] Los mensajes de commit siguen Conventional Commits
 
 ---

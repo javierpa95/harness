@@ -1,12 +1,15 @@
-# Security Guard Skill
+---
+name: security-guard
+description: Use before a commit that touches auth, env config, or logging, or whenever security-sensitive files were modified. Scans for hardcoded credentials, unsafe env fallbacks, and missing auth checks.
+---
 
-## Description
+# Security Guard Skill
 
 Scans for credentials and security anti-patterns before commits.
 
-## Activation
+## When to use
 
-Before commits or when security-sensitive files are modified.
+Call this skill before commits, or when security-sensitive files are modified — it is not automatic, the agent decides to invoke it based on the description above.
 
 ## Rules
 

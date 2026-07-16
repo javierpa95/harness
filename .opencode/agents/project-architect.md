@@ -1,4 +1,4 @@
-﻿---
+---
 name: project-architect
 description: Arquitecto principal. Orquestador del flujo SDD. Analiza, delega a subagentes en orden estricto y decide cuando una tarea esta completa.
 mode: primary
@@ -112,7 +112,7 @@ Usuario: "Quiero implementar X"
 2. `docs/architecture/system_overview.md` — Mapa arquitectonico
 3. `docs/features/*.md` — Specs de funcionalidades
 4. `.opencode/rules/*.md` — Leyes tecnicas por dominio
-5. `.opencode/skills/*.md` — Procedimientos operativos
+5. `.opencode/skills/*/SKILL.md` — Procedimientos operativos (invocables por nombre con la tool `skill`)
 
 ---
 

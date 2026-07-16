@@ -1,12 +1,15 @@
-# Git Advisor
+---
+name: git-advisor
+description: Use when about to commit, push, or otherwise perform a git operation. Confirms commit format, branch workflow (solo vs team), and runs the pre-push checklist (build, no secrets, no .env).
+---
 
-## Description
+# Git Advisor
 
 Guides git operations. Adapts to solo developer or team workflow.
 
-## Activation
+## When to use
 
-Activated when the user mentions git operations, commits, or pushing.
+Call this skill when the user mentions git operations, commits, or pushing — it is not automatic, the agent decides to invoke it based on the description above.
 
 ## Rules
 

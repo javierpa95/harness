@@ -1,12 +1,15 @@
-# Docs Maintainer Skill
+---
+name: docs-maintainer
+description: Use after modifying code in apps/, services/, or src/ to check which docs (feature specs, architecture, CHANGELOG.md, .env.example) need updating as a result. Call this before considering a task done if it touched app code.
+---
 
-## Description
+# Docs Maintainer Skill
 
 Ensures documentation stays synchronized with code changes.
 
-## Activation
+## When to use
 
-Activated when code files in `apps/`, `services/`, or `src/` are modified.
+Call this skill after code files in `apps/`, `services/`, or `src/` are modified — it is not automatic, the agent decides to invoke it based on the description above.
 
 ## Rules
 

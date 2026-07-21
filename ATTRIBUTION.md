@@ -85,3 +85,35 @@ Este documento documenta las fuentes de ideas, patrones y mejoras integradas en 
 ---
 
 _"Todo arte es derivado. Lo importante es attribuir las fuentes y adaptar las ideas a tu contexto."_
+
+---
+
+## Claude Code Mirror
+
+### Estructura .claude/
+
+| Archivo | Funcion | Equivalente en .opencode/ |
+|---------|---------|--------------------------|
+| `CLAUDE.md` | Contexto principal (auto-cargado) | `AGENTS.md` |
+| `.claude/settings.json` | Permisos, hooks, seguridad | `.opencode/opencode.jsonc` |
+| `.claude/commands/start.md` | Comando /start | `.opencode/commands/start.md` |
+| `.claude/commands/end.md` | Comando /end | `.opencode/commands/end.md` |
+| `.claude/skills/handoff/SKILL.md` | Skill de transferencia | `.opencode/skills/handoff/SKILL.md` |
+
+### Diferencias clave con OpenCode
+
+| Caracteristica | OpenCode | Claude Code |
+|---------------|----------|-------------|
+| Contexto principal | `AGENTS.md` | `CLAUDE.md` |
+| Configuracion | `.opencode/opencode.jsonc` | `.claude/settings.json` |
+| Agentes | `.opencode/agents/*.md` | `.claude/agents/*.md` |
+| Skills | `.opencode/skills/*/SKILL.md` | `.claude/skills/*/SKILL.md` |
+| Commands | `.opencode/commands/*.md` | `.claude/commands/*.md` |
+| Plugin format | No aplica | `.claude-plugin/plugin.json` |
+
+### Por que ambos formatos?
+
+- **OpenCode**: Para uso con OpenCode CLI (el agente de Matt Pocock)
+- **Claude Code**: Para uso con Claude Code CLI (Anthropic)
+- **Coexisten**: Ambos pueden estar en el mismo repo sin conflictos
+- **Flexibilidad**: El usuario elige que agente usar segun el caso

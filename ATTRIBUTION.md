@@ -213,3 +213,26 @@ Con un docs-auditor:
 | Husky | Typicode | Popular, bien mantenido |
 | commitlint | Conventional Commits | Validación automática |
 | .gitattributes | GitHub | Normalización cross-platform |
+
+---
+
+## Architect: Diferencias entre plataformas
+
+### OpenCode
+
+- **Architect**: `.opencode/agents/project-architect.md` (agente `primary`)
+- **Flujo**: El agente architect es el orquestador principal
+- **Delegación**: Usa subagentes para tareas específicas
+
+### Claude Code
+
+- **Architect**: `CLAUDE.md` (system prompt principal)
+- **Flujo**: La conversación principal ES el architect
+- **Delegación**: Usa `@subagent` para tareas específicas
+
+### Por qué la diferencia
+
+- OpenCode tiene concepto de `mode: primary` (agente principal)
+- Claude Code NO tiene `primary` — el system prompt principal es el architect
+- En Claude Code, `.claude/agents/` son TODOS subagentes
+- El architect en Claude Code vive en `CLAUDE.md`, no como archivo separado

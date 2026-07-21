@@ -194,11 +194,11 @@ if [ -f ".opencode/agents/project-architect.md" ]; then
   echo -e "  ${GREEN}✓ OpenCode: project-architect.md → ${ARCHITECT_NAME}.md${NC}"
 fi
 
-# Claude Code
-if [ -f ".claude/agents/project-architect.md" ]; then
-  cp ".claude/agents/project-architect.md" ".claude/agents/${ARCHITECT_NAME}.md"
-  sed -i "s/^name: project-architect/name: ${ARCHITECT_NAME}/" ".claude/agents/${ARCHITECT_NAME}.md" 2>/dev/null || true
-  echo -e "  ${GREEN}✓ Claude Code: project-architect.md → ${ARCHITECT_NAME}.md${NC}"
+# Claude Code — architect is in CLAUDE.md, not a separate file
+# Just update the architect name reference in CLAUDE.md
+if [ -f "CLAUDE.md" ]; then
+  sed -i "s/Project Architect/${ARCHITECT_NAME}/g" CLAUDE.md 2>/dev/null || true
+  echo -e "  ${GREEN}✓ Claude Code: architect name updated in CLAUDE.md${NC}"
 fi
 
 # ── 6. Configure agents for stack ──

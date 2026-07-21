@@ -3,7 +3,7 @@
 # Works on Linux, Mac, and Windows via Git Bash (make ships a POSIX shell there).
 # Native PowerShell without Git Bash: use init.ps1 / scripts/dev.ps1 directly instead of make.
 
-.PHONY: help init dev install build test lint format typecheck check docker-up docker-down docker-logs docker-restart docker-build docker-clean check-secrets agents memory hooks audit review backend-test git-setup git-lint-commits git-lint-all clean
+.PHONY: help init dev install build test lint format typecheck check docker-up docker-down docker-logs docker-restart docker-build docker-clean check-secrets agents memory hooks audit review backend-test git-setup git-lint-commits git-lint-all ci-enable ci-disable ci-status clean
 
 # ==========================================
 # Variables — Agent fills these in after init
@@ -63,6 +63,12 @@ help: ## Show available commands
 	@echo "  make git-setup     Setup git hooks (run after npm install)"
 	@echo "  make git-lint-commits Lint last commit message"
 	@echo "  make git-lint-all  Lint all recent commit messages"
+	@echo ""
+	@echo "  CI/CD"
+	@echo "  -----"
+	@echo "  make ci-status     Check CI pipeline status"
+	@echo "  make ci-enable     Enable GitHub Actions CI"
+	@echo "  make ci-disable    Disable GitHub Actions CI"
 	@echo ""
 	@echo "  Cleanup"
 	@echo "  -------"
@@ -209,3 +215,33 @@ git-lint-commits: ## Lint last commit message
 git-lint-all: ## Lint all commit messages
 	@echo "Linting all commit messages..."
 	@npx commitlint --from HEAD~10 --to HEAD --verbose
+
+# ==========================================
+# CI/CD
+# ==========================================
+ci-enable: ## Enable GitHub Actions CI pipeline
+	@echo "Enabling CI pipeline..."
+	@if [ -f ".github/workflows/ci.yml.disabled" ]; then \
+		mv .github/workflows/ci.yml.disabled .github/workflows/ci.yml; \
+		echo "✅ CI pipeline enabled"; \
+	else \
+		echo "⚠️  CI pipeline already enabled or file not found"; \
+	fi
+
+ci-disable: ## Disable GitHub Actions CI pipeline
+	@echo "Disabling CI pipeline..."
+	@if [ -f ".github/workflows/ci.yml" ]; then \
+		mv .github/workflows/ci.yml .github/workflows/ci.yml.disabled; \
+		echo "✅ CI pipeline disabled"; \
+	else \
+		echo "⚠️  CI pipeline already disabled or file not found"; \
+	fi
+
+ci-status: ## Check CI pipeline status
+	@if [ -f ".github/workflows/ci.yml" ]; then \
+		echo "✅ CI pipeline: ENABLED"; \
+	elif [ -f ".github/workflows/ci.yml.disabled" ]; then \
+		echo "⏸️  CI pipeline: DISABLED (run 'make ci-enable' to activate)"; \
+	else \
+		echo "❌ CI pipeline: NOT FOUND"; \
+	fi

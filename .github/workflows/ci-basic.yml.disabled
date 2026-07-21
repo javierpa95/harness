@@ -1,16 +1,11 @@
 # =============================================================================
-# CI Pipeline — SDD Agent Harness
+# CI Basic — Lint + TypeCheck + Test
 # =============================================================================
-# DESCONECTADO por defecto. Para activar:
-#   make ci-enable
-#
-# Para desconectar:
-#   make ci-disable
-#
-# O manualmente: renombra ci.yml.disabled ↔ ci.yml
+# Para activar: make ci-enable-basic
+# Para desconectar: make ci-disable
 # =============================================================================
 
-name: CI
+name: CI Basic
 
 on:
   push:
@@ -27,6 +22,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
       - run: npm ci
       - run: npm run lint
 
@@ -38,6 +34,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
       - run: npm ci
       - run: npx tsc --noEmit
 
@@ -49,6 +46,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
       - run: npm ci
       - run: npm test
 

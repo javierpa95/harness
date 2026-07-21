@@ -3,7 +3,7 @@
 # Works on Linux, Mac, and Windows via Git Bash (make ships a POSIX shell there).
 # Native PowerShell without Git Bash: use init.ps1 / scripts/dev.ps1 directly instead of make.
 
-.PHONY: help init dev install build test lint format typecheck check docker-up docker-down docker-logs docker-restart docker-build docker-clean check-secrets agents memory hooks audit review backend-test git-setup git-lint-commits git-lint-all ci-enable ci-disable ci-status clean
+.PHONY: help init dev install build test lint format typecheck check docker-up docker-down docker-logs docker-restart docker-build docker-clean check-secrets agents memory hooks audit review backend-test git-setup git-lint-commits git-lint-all ci-enable ci-enable-basic ci-enable-advanced ci-disable ci-status clean
 
 # ==========================================
 # Variables — Agent fills these in after init
@@ -66,9 +66,11 @@ help: ## Show available commands
 	@echo ""
 	@echo "  CI/CD"
 	@echo "  -----"
-	@echo "  make ci-status     Check CI pipeline status"
-	@echo "  make ci-enable     Enable GitHub Actions CI"
-	@echo "  make ci-disable    Disable GitHub Actions CI"
+	@echo "  make ci-status       Check CI pipeline status"
+	@echo "  make ci-enable-basic Enable basic CI (lint+test)"
+	@echo "  make ci-enable-adv   Enable advanced CI (security+coverage)"
+	@echo "  make ci-enable       Enable basic CI (alias)"
+	@echo "  make ci-disable      Disable all CI pipelines"
 	@echo ""
 	@echo "  Cleanup"
 	@echo "  -------"
@@ -244,4 +246,52 @@ ci-status: ## Check CI pipeline status
 		echo "⏸️  CI pipeline: DISABLED (run 'make ci-enable' to activate)"; \
 	else \
 		echo "❌ CI pipeline: NOT FOUND"; \
+	fi
+
+# ==========================================
+# CI/CD (actualizado)
+# ==========================================
+ci-enable: ci-enable-basic ## Enable CI pipeline (basic by default)
+
+ci-enable-basic: ## Enable basic CI pipeline (lint + typecheck + test)
+	@echo "Enabling basic CI pipeline..."
+	@if [ -f ".github/workflows/ci-basic.yml.disabled" ]; then \
+		mv .github/workflows/ci-basic.yml.disabled .github/workflows/ci-basic.yml; \
+		echo "✅ Basic CI enabled"; \
+	else \
+		echo "⚠️  Basic CI already enabled or not found"; \
+	fi
+
+ci-enable-advanced: ## Enable advanced CI pipeline (security + coverage + Docker)
+	@echo "Enabling advanced CI pipeline..."
+	@if [ -f ".github/workflows/ci-advanced.yml.disabled" ]; then \
+		mv .github/workflows/ci-advanced.yml.disabled .github/workflows/ci-advanced.yml; \
+		echo "✅ Advanced CI enabled"; \
+	else \
+		echo "⚠️  Advanced CI already enabled or not found"; \
+	fi
+
+ci-disable: ## Disable all CI pipelines
+	@echo "Disabling all CI pipelines..."
+	@mv .github/workflows/ci-basic.yml .github/workflows/ci-basic.yml.disabled 2>/dev/null || true
+	@mv .github/workflows/ci-advanced.yml .github/workflows/ci-advanced.yml.disabled 2>/dev/null || true
+	@mv .github/workflows/ci.yml .github/workflows/ci.yml.disabled 2>/dev/null || true
+	@echo "✅ All CI pipelines disabled"
+
+ci-status: ## Check CI pipeline status
+	@echo "CI Pipeline Status:"
+	@echo "==================="
+	@if [ -f ".github/workflows/ci-basic.yml" ]; then \
+		echo "✅ Basic CI:     ENABLED"; \
+	elif [ -f ".github/workflows/ci-basic.yml.disabled" ]; then \
+		echo "⏸️  Basic CI:     DISABLED"; \
+	else \
+		echo "❌ Basic CI:     NOT FOUND"; \
+	fi
+	@if [ -f ".github/workflows/ci-advanced.yml" ]; then \
+		echo "✅ Advanced CI:  ENABLED"; \
+	elif [ -f ".github/workflows/ci-advanced.yml.disabled" ]; then \
+		echo "⏸️  Advanced CI:  DISABLED"; \
+	else \
+		echo "❌ Advanced CI:  NOT FOUND"; \
 	fi

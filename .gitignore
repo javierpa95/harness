@@ -100,3 +100,8 @@ playwright-report/
 # ==========================================
 .dockerignore
 !/.dockerignore
+
+# Claude Code local files
+.claude/agent-memory-local/
+.claude/agent-activity.log
+CLAUDE.local.md

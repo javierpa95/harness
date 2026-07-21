@@ -117,3 +117,33 @@ _"Todo arte es derivado. Lo importante es attribuir las fuentes y adaptar las id
 - **Claude Code**: Para uso con Claude Code CLI (Anthropic)
 - **Coexisten**: Ambos pueden estar en el mismo repo sin conflictos
 - **Flexibilidad**: El usuario elige que agente usar segun el caso
+
+---
+
+## Hooks y Memoria (Claude Code)
+
+### Fuentes
+
+| Fuente | Que se uso | Link |
+|--------|-----------|------|
+| Claude Code Docs — Hooks | Eventos, matchers, exit codes, ejemplos | https://code.claude.com/docs/en/automation/hooks |
+| Claude Code Docs — Agents | Memory field, scopes, MEMORY.md | https://code.claude.com/docs/en/agents/create-custom-subagents |
+| Matt Pocock — hooks patterns | PreToolUse para validar comandos | https://github.com/mattpocock/skills |
+
+### Hooks implementados
+
+| Hook | Evento | Que hace | Fuente |
+|------|--------|----------|--------|
+| Security guard | PreToolUse Bash | Bloquea comandos peligrosos | Claude Code docs |
+| Python validator | PostToolUse Write(*.py) | Valida sintaxis | Comun en projects |
+| TypeScript validator | PostToolUse Write(*.ts) | Valida tipos | Comun en projects |
+| Docs logger | PostToolUse Write(*.md) | Log de cambios | Custom |
+| Activity logger | Stop | Log de actividad | Custom |
+
+### Memoria implementada
+
+| Agente | Scope | Que recuerda | Fuente |
+|--------|-------|--------------|--------|
+| code-reviewer | project | Convenciones, bugs, patrones | Claude Code docs |
+| gdpr-auditor | project | Endpoints sensibles, vulnerabilidades | Claude Code docs |
+| backend-developer | project | TDD patterns, arquitectura | Claude Code docs |

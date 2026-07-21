@@ -28,7 +28,7 @@ Not just a list of agents — a **connected system** where the architect enforce
 
 ```bash
 # 1. Clone
-git clone https://github.com/javierpa95/0.harnes.git my-project
+git clone https://github.com/javierpa95/harness.git my-project
 cd my-project
 
 # 2. Auto-configure
@@ -131,7 +131,7 @@ make design-ref        # Show reference design systems
 ## Project Structure
 
 ```
-0.harnes/
+harness/
 ├── .opencode/agents/          # OpenCode agents (7)
 ├── .claude/                   # Claude Code config
 │   ├── agents/                # Subagents (6)

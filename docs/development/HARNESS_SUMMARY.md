@@ -182,7 +182,7 @@ Después:
 ## Estructura del Repo
 
 ```
-0.harnes/
+harness/
 ├── .opencode/agents/          ← 7 agentes (OpenCode)
 │   ├── project-architect.md
 │   ├── spec-writer.md
@@ -297,7 +297,7 @@ Ver `ATTRIBUTION.md` para documentación completa.
 ### 1. Clonar
 
 ```bash
-git clone https://github.com/javierpa95/0.harnes.git mi-proyecto
+git clone https://github.com/javierpa95/harness.git mi-proyecto
 cd mi-proyecto
 ```
 

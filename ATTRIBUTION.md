@@ -12,10 +12,10 @@ Este documento documenta las fuentes de ideas, patrones y mejoras integradas en 
 - **Que es**: Skills para Claude Code organizados en categories (engineering, productivity, misc, personal)
 - **Licencia**: MIT
 
-### 2. 0.harnes Original (este proyecto)
+### 2. harness Original (este proyecto)
 - **Autor**: Javier
 - **Queue es**: Template SDD + TDD con harness de agentes de IA
-- **GitHub**: https://github.com/javierpa95/0.harnes
+- **GitHub**: https://github.com/javierpa95/harness
 
 ---
 
@@ -32,7 +32,7 @@ Este documento documenta las fuentes de ideas, patrones y mejoras integradas en 
 | **User-invoked vs Model-invoked** | `.agents/invocation.md` | Documentado en CLAUDE.md del harness | Como referencia, no como implementacion directa. |
 | **Vocabulario tecnico compartido** | `skills/engineering/codebase-design/SKILL.md` | `CONTEXT.md` (seccion Convenciones de Nombres) | Solo las convenciones, no el vocabulario completo de modulos. |
 
-### Originales del 0.harnes (sin cambio)
+### Originales del harness (sin cambio)
 
 | Componente | Que es | Por que se mantiene |
 |------------|--------|---------------------|
@@ -158,7 +158,7 @@ _"Todo arte es derivado. Lo importante es attribuir las fuentes y adaptar las id
 |--------|-----------|------|
 | Matt Pocock — writing-docs.md | Convencion de que los agentes mantienen docs | https://github.com/mattpocock/skills |
 | Claude Code docs — Hooks | PostToolUse para validar actualizaciones | https://code.claude.com/docs/en/automation/hooks |
-| 0.harnes original | SDD flow con revision obligatoria | Este proyecto |
+| harness original | SDD flow con revision obligatoria | Este proyecto |
 
 ### Concepto
 

@@ -1,49 +1,61 @@
-# System Overview — [PROJECT_NAME]
+# System Overview
 
-## Architecture
+**Proyecto:** [PROJECT_NAME]
+**Version:** 0.1.0
+**Ultima actualizacion:** [DATE]
+
+---
+
+## Descripcion General
+
+[Una linea que describe que hace el proyecto]
+
+## Stack
+
+| Capa | Tecnologia | Por que |
+|------|-----------|---------|
+| Frontend | [tecnologia] | [razon] |
+| Backend | [tecnologia] | [razon] |
+| Database | [tecnologia] | [razon] |
+| Deploy | [tecnologia] | [razon] |
+| Auth | [tecnologia] | [razon] |
+
+## Arquitectura
 
 ```
-┌─────────────────────────────────────────┐
-│           [DEPLOYMENT TARGET]            │
-│  ┌──────────────┐    ┌───────────────┐  │
-│  │   Frontend   │◄──►│   Backend     │  │
-│  │   [Port]     │    │   [Port]      │  │
-│  │              │    │               │  │
-│  └──────────────┘    └───────────────┘  │
-└─────────────────────────────────────────┘
+[Diagrama de arquitectura en ASCII o Mermaid]
 ```
-
-> **Actualizar este diagrama** con la arquitectura real del proyecto.
-
-## Components
-
-### Frontend: [FRAMEWORK] (apps/web/)
-
-- Describir las principales areas de la UI
-- Rutas publicas vs protegidas
-- Integraciones externas
-
-### Backend: [TECHNOLOGY] (services/backend/)
-
-- Auth y gestion de usuarios
-- Principales entidades/collections
-- API endpoints o collections principales
 
 ## Data Flow
 
-1. **User** → Describir flujo principal
-2. **Admin** → Describir flujo de administracion
-3. **System** → Describir procesos automaticos
+```
+[Como viajan los datos por el sistema]
+```
 
-## Tech Stack
+## Endpoints Principales
 
-| Layer | Technology | Purpose |
-|-------|-----------|---------|
-| Frontend | [Framework] | [Purpose] |
-| Backend | [Technology] | [Purpose] |
-| Database | [DB] | [Purpose] |
-| Deployment | [Platform] | [Purpose] |
+| Method | Path | Auth | Descripcion |
+|--------|------|------|-------------|
+| GET | /api/health | no | Health check |
+| [method] | [path] | [yes/no] | [descripcion] |
 
-## Data Model
+## Dependencias Externas
 
-Ver `AGENTS.md` para el esquema de datos principal.
+| Servicio | Uso | Config |
+|----------|-----|--------|
+| [servicio] | [uso] | [variable de entorno] |
+
+## Decisiones Arquitectonicas
+
+Ver `docs/architecture/` para ADRs (Architecture Decision Records).
+
+## Seguridad
+
+- Auth via [metodo]
+- Datos sensibles en [ubicacion]
+- Rate limiting en [endpoints]
+- CORS configurado para [origenes]
+
+---
+
+_Actualiza este documento cuando cambie la arquitectura._

@@ -73,8 +73,9 @@ ATTRIBUTION.md            Sources and patterns documentation
 1. **Spec first**: No code without an approved spec in `docs/features/`
 2. **TDD in backend/utils**: Tests before code. Each acceptance criteria = at least one test
 3. **Review mandatory**: Every functional change goes through code-reviewer (2 axes)
-4. **Parallel where possible**: Frontend + backend in parallel; review + GDPR audit in parallel
-5. **Architect decides**: Only the architect can mark a task as done
+4. **Docs mandatory**: Every functional change goes through docs-auditor before commit
+5. **Parallel where possible**: Frontend + backend in parallel; review + GDPR audit in parallel
+6. **Architect decides**: Only the architect can mark a task as done
 
 ### TDD Cycle (Red → Green → Refactor)
 

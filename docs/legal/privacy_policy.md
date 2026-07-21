@@ -1,28 +1,42 @@
-# Privacy Policy — [PROJECT_NAME]
+# Privacy Policy
 
-Last updated: [DATE]
+**Proyecto:** [PROJECT_NAME]
+**Version:** [VERSION]
+**Ultima actualizacion:** [DATE]
 
-## Data We Collect
+---
 
-[Describe what personal data, if any, the project collects and how it's handled.]
+## Datos Recopilados
 
-## Cookies
+| Tipo de dato | Como se recopila | Para que se usa | Retencion |
+|-------------|------------------|-----------------|-----------|
+| [tipo] | [metodo] | [uso] | [tiempo] |
 
-[Describe cookie usage — or state that none are used.]
+## Base Legal
 
-## Third-Party Services
+- Consentimiento del usuario
+- Ejecucion de contrato
+- Interes legitimo
 
-- **[Service Name]**: [Description of what data they handle]. Their privacy policy applies.
+## Derechos del Usuario
 
-## Your Rights
+- **Acceso:** El usuario puede solicitar sus datos
+- **Rectificacion:** El usuario puede corregir datos
+- **Supresion:** El usuario puede borrar sus datos
+- **Portabilidad:** El usuario puede exportar sus datos
+- **Oposicion:** El usuario puede oponerse al procesamiento
 
-Under applicable privacy laws (GDPR, CCPA, etc.), you have the right to:
-- Access any personal data we hold about you
-- Request correction of inaccurate data
-- Request deletion of your data
+## Seguridad
 
-[Contact method for privacy inquiries.]
+- Datos en transito: [encriptacion]
+- Datos en reposo: [encriptacion]
+- Acceso: [control de acceso]
 
-## Contact
+## Contacto
 
-For privacy inquiries, contact us at [CONTACT_INFO].
+- Email: [email]
+- Responsable: [nombre]
+
+---
+
+_Actualiza este documento cuando cambien las praticas de datos._

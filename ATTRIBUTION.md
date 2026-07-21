@@ -147,3 +147,37 @@ _"Todo arte es derivado. Lo importante es attribuir las fuentes y adaptar las id
 | code-reviewer | project | Convenciones, bugs, patrones | Claude Code docs |
 | gdpr-auditor | project | Endpoints sensibles, vulnerabilidades | Claude Code docs |
 | backend-developer | project | TDD patterns, arquitectura | Claude Code docs |
+
+---
+
+## Docs Auditor
+
+### Inspiracion
+
+| Fuente | Que se uso | Link |
+|--------|-----------|------|
+| Matt Pocock — writing-docs.md | Convencion de que los agentes mantienen docs | https://github.com/mattpocock/skills |
+| Claude Code docs — Hooks | PostToolUse para validar actualizaciones | https://code.claude.com/docs/en/automation/hooks |
+| 0.harnes original | SDD flow con revision obligatoria | Este proyecto |
+
+### Concepto
+
+El docs-auditor es un **agente de validacion** que:
+- No edita archivos (solo lectura)
+- Verifica que cambios de codigo tengan su documentacion
+- Se ejecuta como paso obligatorio antes de commit
+- Tiene memoria compartida (agent-memory/docs-auditor/)
+
+### Por que es importante
+
+Sin un docs-auditor:
+- El CHANGELOG se queda sin actualizar
+- El system_overview pierde sincronia con el codigo
+- Las specs quedan con status incorrecto
+- CONTEXT.md no refleja nuevos terminos
+
+Con un docs-auditor:
+- Siempre hay documentacion actualizada
+- Los nuevos desarrolladores entienden el codigo
+- Los agentes tienen contexto correcto
+- El proyecto mantiene calidad a largo plazo

@@ -129,6 +129,7 @@ Ademas, aplica **TDD (Test-Driven Development)** en backend y utils/shared.
 - **Spec primero**: No se escribe codigo sin una spec aprobada en `docs/features/`.
 - **TDD en backend/utils**: Tests antes del codigo. Cada acceptance criteria de la spec se traduce en al menos un test.
 - **Review obligatorio**: Todo cambio funcional pasa por code-reviewer (2 ejes). Solo se skippea en cambios triviales (texto, color, formateo).
+- **Docs obligatorio**: Todo cambio funcional pasa por docs-auditor antes de commit. Si falta documentacion, se actualiza primero.
 - **Paralelismo**: Frontend y backend se implementan en paralelo si ambos son necesarios.
 - **Seguridad en paralelo**: Si hay datos sensibles, `code-reviewer` + `gdpr-auditor` corren simultaneamente.
 - **Architect decide**: Solo el architect puede marcar una tarea como done o pedir iteracion.
@@ -141,7 +142,7 @@ Ademas, aplica **TDD (Test-Driven Development)** en backend y utils/shared.
 | Cambio trivial (texto, color) | Analyze -> Implement -> Decide (skip spec + review) |
 | Bug fix sin cambio de comportamiento | Analyze -> Implement -> Decide |
 | Bug fix que cambia comportamiento | Flujo completo (spec obligatoria + tests) |
-| Datos sensibles | Review + GDPR audit en paralelo |
+| Datos sensibles | Review + GDPR + Docs en paralelo |
 
 ---
 
@@ -326,6 +327,8 @@ El proyecto usa un harness de agentes de IA para coordinar el desarrollo mediant
 | `code-reviewer` | Revisa implementacion (2 ejes: Standards + Spec) | `.opencode/agents/code-reviewer.md` |
 | `gdpr-auditor` | Seguridad, privacidad basica | `.opencode/agents/gdpr-auditor.md` |
 | `release-manager` | Versionado, releases, changelog | `.opencode/agents/release-manager.md` |
+| `docs-auditor` | Verifica que cambios de codigo actualizan docs | `.opencode/agents/docs-auditor.md` |
+| `docs-auditor` | Verifica que cambios de codigo actualizan docs | `.opencode/agents/docs-auditor.md` |
 
 ### Skills
 

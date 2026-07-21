@@ -1,39 +1,64 @@
 # Feature: [FEATURE_NAME]
 
+## Status
+
+`draft` | `approved` | `in-progress` | `done` | `deprecated`
+
 ## Overview
 
-[One-line description of what this feature does and why it exists.]
+[Que hace esta feature y por que existe. Una linea.]
 
 ## User Stories
 
 1. As a [role], I want to [action] so that [benefit].
 2. As a [role], I want to [action] so that [benefit].
 
-## Technical Details
+## Acceptance Criteria
 
-### Data Source
+- [ ] Criterio verificable 1
+- [ ] Criterio verificable 2
+- [ ] Criterio verificable 3
 
-[Where does the data come from? API, database, external service?]
+## Data Contract
 
-### Fields / Schema
+### Entities / Models
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `field_name` | type | Description |
+| Entity | Field | Type | Required | Description |
+|--------|-------|------|----------|-------------|
+| [entity] | [field] | [type] | [yes/no] | [description] |
 
-### Pages / Endpoints
+### API Endpoints / Operations
 
-- `/route` — Description of what this page/endpoint does
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| [METHOD] | [/path] | [yes/no] | [description] |
 
-### Integration Points
+## Edge Cases
 
-[How does this feature connect with other parts of the system?]
+- Que pasa cuando [caso borde]?
+- Como se maneja [error scenario]?
 
-### Edge Cases
+## Security / Privacy
 
-- What happens when [edge case]?
-- How is [error scenario] handled?
+- [ ] Datos sensibles involucrados?
+- [ ] Auth requerida?
+- [ ] Rate limiting?
 
-### Privacy / Security
+## Dependencies
 
-- [Any privacy or security considerations for this feature]
+- [Depende de otra feature o servicio externo?]
+
+## Documentation Updates
+
+Cuando esta feature se implemente, actualizar:
+- [ ] `docs/architecture/system_overview.md` (si cambia arquitectura)
+- [ ] `docs/CHANGELOG.md` (nueva entrada)
+- [ ] `CONTEXT.md` (si hay nuevos terminos de dominio)
+
+## Notes
+
+[Decisiones tomadas, trade-offs considerados.]
+
+---
+
+_Sigue este template para cada feature. La spec es el contrato entre architect y developers._

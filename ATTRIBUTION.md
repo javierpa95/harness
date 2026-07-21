@@ -1,0 +1,87 @@
+# ATTRIBUTION.md — De donde viene cada cosa
+
+Este documento documenta las fuentes de ideas, patrones y mejoras integradas en el harness. Transparencia total sobre que se hisho propio y que se robo (con credito).
+
+---
+
+## Fuentes Principales
+
+### 1. Matt Pocock — mattpocock/skills
+- **Repo**: https://github.com/mattpocock/skills
+- **Stars**: 180k+ | **Forks**: 15.3k+
+- **Que es**: Skills para Claude Code organizados en categories (engineering, productivity, misc, personal)
+- **Licencia**: MIT
+
+### 2. 0.harnes Original (este proyecto)
+- **Autor**: Javier
+- **Queue es**: Template SDD + TDD con harness de agentes de IA
+- **GitHub**: https://github.com/javierpa95/0.harnes
+
+---
+
+## Ideas Integradas
+
+### Del repositorio de Matt Pocock
+
+| Idea | Skill original | Donde va en nuestro harness | Que cambio |
+|------|---------------|---------------------------|------------|
+| **Code Review en 2 ejes** | `skills/engineering/code-review/SKILL.md` | `.opencode/agents/code-reviewer.md` | Adaptado a nuestro formato de agentes (no skills). Mantenemos el baseline de code smells de Fowler. |
+| **Handoff document** | `skills/productivity/handoff/SKILL.md` | `.opencode/skills/handoff/SKILL.md` | Simplificado. Sin dependencia de issue tracker externo. |
+| **Grilling (entrevista relajada)** | `skills/productivity/grilling/SKILL.md` | `.opencode/agents/project-architect.md` (modo grilling) | Integrado como modo del architect, no skill separada. |
+| **Context.md como glosario** | `skills/engineering/domain-modeling/SKILL.md` | `CONTEXT.md` en raiz del proyecto | Simplificado a glosario basico. Sin ADRs por ahora. |
+| **User-invoked vs Model-invoked** | `.agents/invocation.md` | Documentado en CLAUDE.md del harness | Como referencia, no como implementacion directa. |
+| **Vocabulario tecnico compartido** | `skills/engineering/codebase-design/SKILL.md` | `CONTEXT.md` (seccion Convenciones de Nombres) | Solo las convenciones, no el vocabulario completo de modulos. |
+
+### Originales del 0.harnes (sin cambio)
+
+| Componente | Que es | Por que se mantiene |
+|------------|--------|---------------------|
+| **GDPR Auditor** | Auditoria de seguridad y privacidad | Especifico para datos de salud. Matt no maneja esto. |
+| **Release Manager** | Versionado y releases | Workflow completo que Matt no tiene. |
+| **SDD Flow** | Specification-Driven Development | Mas riguroso que el flujo de Matt. |
+| **TDD en backend** | Red-Green-Refactor obligatorio | Bien definido, funciona. |
+| **Docker/CI templates** | docker-compose.yml, GitHub Actions | Listos para Coolify. |
+
+---
+
+## Que NO se integro (y por que)
+
+| Idea de Matt | Por que no |
+|-------------|------------|
+| **ask-matt (router de skills)** | Nuestro architect ya es el router. No necesitamos un skill separado. |
+| **ADR (Architecture Decision Records)** | Util pero premature para templates. Se puede anadir despues. |
+| **CONTEXT-MAP.md** (multi-contexto) | Solo tenemos un contexto por proyecto. |
+| **Claude Code plugin** | Matt distribuye como plugin. Nosotros como template cloneable. |
+| **docs/ publicados en aihero.dev** | Matt publica docs en web. Nosotros mantenemos todo en el repo. |
+
+---
+
+## Referencias Adicionales
+
+| Fuente | Que se uso | Link |
+|--------|-----------|------|
+| **Martin Fowler — Refactoring** | Baseline de code smells (ch.3) | https://martinfowler.com/articles/refactoring-a-book-list.html |
+| **Michael Feathers — Working Effectively with Legacy Code** | Concepto de "seam" | https://feathersworking.com/ |
+| **John Ousterhout — A Philosophy of Software Design** | Concepto de "deep module" (referenciado, no integrado) | https://www.amazon.com/Philosophy-Software-Design-John-Ousterhout/dp/1732102201 |
+
+---
+
+## Como se hisho
+
+1. **Analisis**: Se reviso el repo de Matt Pocock en profundidad (16 jul 2025)
+2. **Evaluacion**: Se identificaron ideas compatibles con nuestro harness
+3. **Adaptacion**: Se modificaron para encajar en nuestro formato `.opencode/agents/`
+4. **Integracion**: Se anadieron sin romper el flujo SDD existente
+5. **Documentacion**: Este fichero registra todo para transparencia
+
+---
+
+## Version
+
+- **Harness**: 0.1.0
+- **Ultima actualizacion**: 16 julio 2025
+- **Proxima revision**: Cuando Matt actualice sus skills o cuando necesitemos nuevas ideas
+
+---
+
+_"Todo arte es derivado. Lo importante es attribuir las fuentes y adaptar las ideas a tu contexto."_

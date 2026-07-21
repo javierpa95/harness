@@ -1,8 +1,8 @@
 # AGENTS.md — Template de Proyecto (SDD Agent Harness)
 
-**Proyecto:** [PROJECT_NAME] — [ONE_LINE_DESCRIPTION]  
-**Stack:** [STACK_TECH]  
-**Version:** 0.1.0  
+**Proyecto:** [PROJECT_NAME] — [ONE_LINE_DESCRIPTION]
+**Stack:** [STACK_TECH]
+**Version:** 0.1.0
 **Ultima actualizacion:** [DATE]
 
 ---
@@ -63,28 +63,32 @@ src/
 ### Paso 4: Nombrar el agente arquitecto
 
 El arquitecto principal se nombra como `[project]-architect`. Ejemplos:
-- Tienda Marysol → `store-architect`
-- TaskFlow → `taskflow-architect`
-- MiBlog → `blog-architect`
+- Tienda Marysol -> `store-architect`
+- TaskFlow -> `taskflow-architect`
+- MiBlog -> `blog-architect`
 
 Renombra el archivo `.opencode/agents/project-architect.md` y actualiza su frontmatter.
 
 ### Paso 5: Configurar agentes relevantes
 
-Elimina agentes que no apliquen al stack. Añade nuevos si es necesario.
+Elimina agentes que no apliquen al stack. Anade nuevos si es necesario.
 
 | Agente template | Cuando usarlo |
 |-----------------|---------------|
 | `spec-writer` | Siempre — escribe feature specs |
 | `frontend-developer` | Si hay frontend (web, mobile, desktop UI) |
 | `backend-developer` | Si hay backend/API/database |
-| `code-reviewer` | Siempre — revisa implementacion contra spec |
+| `code-reviewer` | Siempre — revisa implementacion (2 ejes: Standards + Spec) |
 | `gdpr-auditor` | Si manejas datos de usuarios |
 | `release-manager` | Si necesitas versionado formal |
 
 ### Paso 6: Actualizar este archivo
 
 Rellena los placeholders del header y las secciones siguientes con la info del proyecto.
+
+### Paso 7: Crear CONTEXT.md
+
+Crea `CONTEXT.md` en la raiz del proyecto con el glosario de dominio. Define los terminos clave que los agentes usaran.
 
 ---
 
@@ -96,11 +100,11 @@ Ademas, aplica **TDD (Test-Driven Development)** en backend y utils/shared.
 ### El Ciclo
 
 ```
-1. ANALYZ    → Architect analiza la peticion
-2. SPEC      → Spec Writer crea/actualiza la spec
-3. IMPLEMENT → Developers implementan (con TDD en backend/utils)
-4. REVIEW    → Code Reviewer verifica contra la spec + tests
-5. DECIDE    → Architect: ¿Pasa (commit) o itera?
+1. ANALYZ    -> Architect analiza la peticion (o hace grilling si el plan es complejo)
+2. SPEC      -> Spec Writer crea/actualiza la spec
+3. IMPLEMENT -> Developers implementan (con TDD en backend/utils)
+4. REVIEW    -> Code Reviewer verifica (2 ejes: Standards + Spec)
+5. DECIDE    -> Architect: Pasa (commit) o itera?
 ```
 
 ### TDD — Donde aplica y donde no
@@ -111,30 +115,31 @@ Ademas, aplica **TDD (Test-Driven Development)** en backend y utils/shared.
 | **Utils/Shared** (helpers, validators) | **SI** | Funciones puras, tests simples |
 | **Frontend** (UI, componentes, paginas) | **NO** | Complejo de testear, menor ROI |
 
-### TDD Cycle (Red → Green → Refactor)
+### TDD Cycle (Red -> Green -> Refactor)
 
 ```
-1. RED     → Escribe test que falla (comportamiento esperado)
-2. GREEN   → Escribe el minimo codigo para que pase
-3. REFACTOR → Mejora el codigo sin romper tests
-4. REPITE  → Siguiente comportamiento
+1. RED     -> Escribe test que falla (comportamiento esperado)
+2. GREEN   -> Escribe el minimo codigo para que pase
+3. REFACTOR -> Mejora el codigo sin romper tests
+4. REPITE  -> Siguiente comportamiento
 ```
 
 ### Reglas del Flujo
 
 - **Spec primero**: No se escribe codigo sin una spec aprobada en `docs/features/`.
 - **TDD en backend/utils**: Tests antes del codigo. Cada acceptance criteria de la spec se traduce en al menos un test.
-- **Review obligatorio**: Todo cambio funcional pasa por code-reviewer. Solo se skippea en cambios triviales (texto, color, formateo).
+- **Review obligatorio**: Todo cambio funcional pasa por code-reviewer (2 ejes). Solo se skippea en cambios triviales (texto, color, formateo).
 - **Paralelismo**: Frontend y backend se implementan en paralelo si ambos son necesarios.
 - **Seguridad en paralelo**: Si hay datos sensibles, `code-reviewer` + `gdpr-auditor` corren simultaneamente.
 - **Architect decide**: Solo el architect puede marcar una tarea como done o pedir iteracion.
+- **Grilling**: Si el plan es complejo, el architect hace entrevista relajada antes del flujo SDD.
 
 ### Excepciones
 
 | Caso | Flujo |
 |------|-------|
-| Cambio trivial (texto, color) | Analyze → Implement → Decide (skip spec + review) |
-| Bug fix sin cambio de comportamiento | Analyze → Implement → Decide |
+| Cambio trivial (texto, color) | Analyze -> Implement -> Decide (skip spec + review) |
+| Bug fix sin cambio de comportamiento | Analyze -> Implement -> Decide |
 | Bug fix que cambia comportamiento | Flujo completo (spec obligatoria + tests) |
 | Datos sensibles | Review + GDPR audit en paralelo |
 
@@ -153,7 +158,7 @@ Ademas, aplica **TDD (Test-Driven Development)** en backend y utils/shared.
 
 Conventional Commits: `type(scope): description`
 
-| Type | Cuándo | Ejemplo |
+| Type | Cuando | Ejemplo |
 |------|--------|---------|
 | `feat` | Nueva funcionalidad | `feat(auth): add login page and session management` |
 | `fix` | Bug fix | `fix(products): handle empty product list in catalog` |
@@ -217,6 +222,9 @@ docs/
 
 config/
   .env.example            Variables de entorno
+
+CONTEXT.md                Glosario de dominio (obligatorio)
+ATTRIBUTION.md            Fuentes de ideas y patrones
 ```
 
 ---
@@ -233,10 +241,10 @@ config/
 
 ## Proceso de Desarrollo
 
-1. **Entiende** el contexto leyendo AGENTS.md y docs relevantes.
+1. **Entiende** el contexto leyendo AGENTS.md, CONTEXT.md y docs relevantes.
 2. **Especifica** la feature en `docs/features/` (flujo SDD).
 3. **Implementa** siguiendo la spec.
-4. **Revisa** que la implementacion cumple la spec.
+4. **Revisa** que la implementacion cumple la spec (2 ejes: Standards + Spec).
 5. **Commitea** con mensaje claro y atomico.
 6. **Documenta** si has tocado codigo de la app.
 7. **Registra** hallazgos en `docs/development/agent_memory.md`.
@@ -311,13 +319,31 @@ El proyecto usa un harness de agentes de IA para coordinar el desarrollo mediant
 
 | Agente | Dominio | Archivo |
 |--------|---------|---------|
-| `[project]-architect` | Orquestador SDD (analiza, delega, decide) | `.opencode/agents/[project]-architect.md` |
+| `[project]-architect` | Orquestador SDD (analiza, delega, decide, grilling) | `.opencode/agents/[project]-architect.md` |
 | `spec-writer` | Escribe/actualiza feature specs | `.opencode/agents/spec-writer.md` |
 | `frontend-developer` | Implementa frontend (UI) | `.opencode/agents/frontend-developer.md` |
 | `backend-developer` | Implementa backend (API, DB, auth) | `.opencode/agents/backend-developer.md` |
-| `code-reviewer` | Revisa implementacion contra spec | `.opencode/agents/code-reviewer.md` |
+| `code-reviewer` | Revisa implementacion (2 ejes: Standards + Spec) | `.opencode/agents/code-reviewer.md` |
 | `gdpr-auditor` | Seguridad, privacidad basica | `.opencode/agents/gdpr-auditor.md` |
 | `release-manager` | Versionado, releases, changelog | `.opencode/agents/release-manager.md` |
+
+### Skills
+
+| Skill | Uso | Archivo |
+|-------|-----|---------|
+| `handoff` | Transferir contexto a otro agente | `.opencode/skills/handoff/SKILL.md` |
+
+### Tabla de Routing (cuando usar cada agente/skill)
+
+| El usuario dice... | Usa... |
+|-------------------|--------|
+| "Quiero implementar X" | `project-architect` (flujo SDD) |
+| "Tengo una idea" / "Que te parece esto" | `project-architect` (modo grilling) |
+| "Revisa este codigo" | `code-reviewer` |
+| "Que falta para el release?" | `release-manager` |
+| "Hay problemas de seguridad?" | `gdpr-auditor` |
+| "Escribe la spec de X" | `spec-writer` |
+| "Necesito que otro agente continue esto" | `handoff` |
 
 ### Comandos de Sesion
 

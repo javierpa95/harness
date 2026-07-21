@@ -1,0 +1,43 @@
+{
+  "name": "0.harnes",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SDD Agent Harness — Template for AI-coordinated development",
+  "scripts": {
+    "prepare": "husky",
+    "commitlint": "commitlint --edit",
+    "lint:commits": "commitlint --from HEAD~1 --to HEAD --verbose"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.0.0",
+    "@commitlint/config-conventional": "^19.0.0",
+    "husky": "^9.0.0"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ],
+    "rules": {
+      "type-enum": [
+        2,
+        "always",
+        [
+          "feat",
+          "fix",
+          "docs",
+          "style",
+          "refactor",
+          "perf",
+          "test",
+          "build",
+          "ci",
+          "chore",
+          "revert",
+          "security"
+        ]
+      ],
+      "subject-case": [0],
+      "body-max-line-length": [0]
+    }
+  }
+}

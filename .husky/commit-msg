@@ -1,0 +1,47 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Conventional Commits pattern
+# type(scope): description
+# Types: feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert|security
+COMMIT_MSG_FILE=$1
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+# Pattern: type(scope): description
+# - type: required, lowercase
+# - scope: optional, lowercase, in parentheses
+# - description: required, lowercase, max 100 chars
+PATTERN="^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert|security)(\([a-z0-9-]+\))?: .{1,100}$"
+
+if ! echo "$COMMIT_MSG" | grep -qE "$PATTERN"; then
+  echo ""
+  echo "❌ Invalid commit message format!"
+  echo ""
+  echo "   Expected: type(scope): description"
+  echo ""
+  echo "   Types:"
+  echo "     feat:     New feature"
+  echo "     fix:      Bug fix"
+  echo "     docs:     Documentation"
+  echo "     style:    Formatting (no code change)"
+  echo "     refactor: Code restructuring"
+  echo "     perf:     Performance improvement"
+  echo "     test:     Adding tests"
+  echo "     build:    Build system"
+  echo "     ci:       CI configuration"
+  echo "     chore:    Maintenance"
+  echo "     revert:   Revert commit"
+  echo "     security: Security fix"
+  echo ""
+  echo "   Examples:"
+  echo "     feat: add user authentication"
+  echo "     fix(api): handle null response"
+  echo "     docs: update deployment guide"
+  echo "     chore(deps): update dependencies"
+  echo ""
+  echo "   Your message: $COMMIT_MSG"
+  echo ""
+  exit 1
+fi
+
+echo "✅ Commit message format valid"

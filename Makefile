@@ -3,7 +3,7 @@
 # Works on Linux, Mac, and Windows via Git Bash (make ships a POSIX shell there).
 # Native PowerShell without Git Bash: use init.ps1 / scripts/dev.ps1 directly instead of make.
 
-.PHONY: help init dev install build test lint format typecheck check docker-up docker-down docker-logs docker-restart docker-build docker-clean check-secrets agents memory hooks audit review backend-test clean
+.PHONY: help init dev install build test lint format typecheck check docker-up docker-down docker-logs docker-restart docker-build docker-clean check-secrets agents memory hooks audit review backend-test git-setup git-lint-commits git-lint-all clean
 
 # ==========================================
 # Variables — Agent fills these in after init
@@ -57,6 +57,12 @@ help: ## Show available commands
 	@echo "  Security"
 	@echo "  --------"
 	@echo "  make check-secrets Scan for secrets"
+	@echo ""
+	@echo "  Git"
+	@echo "  ---"
+	@echo "  make git-setup     Setup git hooks (run after npm install)"
+	@echo "  make git-lint-commits Lint last commit message"
+	@echo "  make git-lint-all  Lint all recent commit messages"
 	@echo ""
 	@echo "  Cleanup"
 	@echo "  -------"
@@ -187,3 +193,19 @@ clean: ## Remove build artifacts and node_modules
 	@rm -rf $(BACKEND_DIR)/dist
 	@rm -rf $(BACKEND_DIR)/node_modules
 	@echo Clean complete
+
+# ==========================================
+# Git
+# ==========================================
+git-setup: ## Setup git hooks (run after npm install)
+	@echo "Setting up git hooks..."
+	@npx husky
+	@echo "✅ Git hooks installed"
+
+git-lint-commits: ## Lint last commit message
+	@echo "Linting last commit message..."
+	@npx commitlint --from HEAD~1 --to HEAD --verbose
+
+git-lint-all: ## Lint all commit messages
+	@echo "Linting all commit messages..."
+	@npx commitlint --from HEAD~10 --to HEAD --verbose

@@ -1,0 +1,19 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Pre-commit checks..."
+
+# Check for secrets
+if git diff --cached --name-only | xargs grep -l -E "(password|secret|token|api_key)\s*[:=]\s*['\"]" 2>/dev/null; then
+  echo "❌ Potential secrets detected in staged files!"
+  echo "   Please remove secrets before committing."
+  exit 1
+fi
+
+# Check for console.log in production code
+if git diff --cached --name-only | grep -E "\.(ts|tsx|js|jsx)$" | xargs grep -l "console\.log" 2>/dev/null; then
+  echo "⚠️  console.log found in staged files."
+  echo "   Consider removing before commit."
+fi
+
+echo "✅ Pre-commit checks passed"

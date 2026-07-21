@@ -181,3 +181,35 @@ Con un docs-auditor:
 - Los nuevos desarrolladores entienden el codigo
 - Los agentes tienen contexto correcto
 - El proyecto mantiene calidad a largo plazo
+
+---
+
+## Git Workflow y Herramientas
+
+### Fuentes
+
+| Fuente | Que se uso | Link |
+|--------|-----------|------|
+| Conventional Commits | Formato de mensajes de commit | https://www.conventionalcommits.org/ |
+| Husky | Git hooks manager | https://typicode.github.io/husky/ |
+| commitlint | Validación de mensajes | https://commitlint.js.org/ |
+| gitattributes | Normalización de line endings | https://git-scm.com/docs/gitattributes |
+| angular/.github | Referencia de conventional commits | https://github.com/angular/angular/blob/main/CONTRIBUTING.md#commit |
+
+### Herramientas integradas
+
+| Herramienta | Que hace | Hooks |
+|-------------|----------|-------|
+| Husky | Gestiona git hooks | pre-commit, commit-msg |
+| commitlint | Valida mensajes de commit | commit-msg |
+| .gitattributes | Normaliza line endings | N/A |
+| .gitignore | Excluye archivos innecesarios | N/A |
+
+### Convenciones adoptadas
+
+| Convencion | De donde | Por que |
+|------------|----------|---------|
+| Conventional Commits | Angular/Google | Estandar de la industria |
+| Husky | Typicode | Popular, bien mantenido |
+| commitlint | Conventional Commits | Validación automática |
+| .gitattributes | GitHub | Normalización cross-platform |

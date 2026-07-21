@@ -1,196 +1,226 @@
-# SDD Agent Harness — Template de Proyecto
+# 🚀 SDD Agent Harness
 
-Plantilla lista para iniciar cualquier proyecto de software con un **harness de agentes de IA** coordinando el desarrollo mediante **Specification-Driven Development (SDD)**.
+**Development harness for AI-coordinated projects using Specification-Driven Development.**
 
-**Stack:** Agnostico (configurable al iniciar proyecto)  
-**Version:** 0.1.0
+Not just a list of agents — a **connected system** where the architect enforces specs, reviews, and docs before every commit.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
 
-## ¿Que es esto?
+## What's Inside
 
-Este template proporciona:
-
-- **Agentes de IA especializados** que piensan, analizan y planifican antes de escribir codigo
-- **Estructura de proyecto** probada para full-stack web apps
-- **Reglas de desarrollo** que previenen errores comunes
-- **Documentacion automatica** sincronizada con el codigo
-- **Flujo de trabajo** que separa planificacion de ejecucion
+| Feature | Description |
+|---------|-------------|
+| **8 Agents** | Architect, spec-writer, frontend/backend developers, code-reviewer, docs-auditor, gdpr-auditor, release-manager |
+| **6-Step SDD Flow** | Analyze → Spec → Implement → Review → Docs → Decide |
+| **2 Platform Support** | Claude Code + OpenCode (same repo, both work) |
+| **Shared Memory** | Agents remember across sessions and platforms |
+| **Git Hooks** | Husky + commitlint (conventional commits) |
+| **CI/CD** | Basic + Advanced pipelines (disabled by default) |
+| **Design System** | DESIGN.md + 142 reference systems (Material, Apple, Shadcn...) |
+| **Security Hooks** | Block dangerous commands, validate syntax |
+| **30+ Make Commands** | Everything exposed via `make` |
 
 ---
 
 ## Quick Start
 
-### 1. Copiar la plantilla
-
 ```bash
-git clone <repo-url> my-project
+# 1. Clone
+git clone https://github.com/javierpa95/0.harnes.git my-project
 cd my-project
+
+# 2. Auto-configure
+make init
+
+# 3. Start developing
+# Open in Claude Code or OpenCode — the architect guides you
 ```
 
-### 2. Configurar el proyecto
+### What `make init` does:
 
-Dos formas, elige una — hacen lo mismo, `init.sh` es el camino recomendado porque no depende de que el agente tenga permiso de editar `.opencode/`:
+1. Asks for project name, description, type
+2. Asks for stack (frontend, backend, database, deploy)
+3. Asks for design system (Material, Apple, Shadcn, etc.)
+4. Installs dependencies (husky, commitlint)
+5. Configures git hooks
+6. Fills placeholders in AGENTS.md, CLAUDE.md
+7. Creates DESIGN.md and CODING_STANDARDS.md
+8. Generates prompt.md for agent to finish setup
 
-**Opcion A — script interactivo (recomendado):**
+---
+
+## The SDD Flow
+
+```
+1. ANALYZE  → Architect analyzes the request
+2. SPEC     → Spec-writer creates/updates the spec
+3. IMPLEMENT → Developers implement (TDD for backend)
+4. REVIEW   → Code-reviewer verifies (2 axes: Standards + Spec)
+5. DOCS     → Docs-auditor verifies documentation
+6. DECIDE   → Architect: PASS (commit) or FAIL (iterate)
+```
+
+**Rule:** No commit without docs-auditor approval.
+
+---
+
+## Agents
+
+| Agent | Role | When to use |
+|-------|------|-------------|
+| **architect** | SDD orchestrator, decides | Always — entry point |
+| **spec-writer** | Writes feature specs | Before implementing |
+| **frontend-developer** | Implements UI | If there's a frontend |
+| **backend-developer** | Implements API/DB with TDD | If there's a backend |
+| **code-reviewer** | Reviews in 2 axes (Standards + Spec) | After implementing |
+| **docs-auditor** | Verifies docs are updated | **Always before commit** |
+| **gdpr-auditor** | Security/privacy audit | If handling user data |
+| **release-manager** | Versioning and releases | When preparing release |
+
+### Code Review: 2 Axes
+
+```
+Axis 1: Standards — Does the code follow project conventions?
+Axis 2: Spec — Does the code implement what the spec asked for?
+
+Both run in parallel. Reports are separate.
+```
+
+---
+
+## Platform Support
+
+### Claude Code
+
+- Architect lives in `CLAUDE.md` (system prompt)
+- Subagents in `.claude/agents/`
+- Hooks in `.claude/settings.json`
+- Skills in `.claude/skills/`
+
+### OpenCode
+
+- Architect in `.opencode/agents/project-architect.md` (mode: primary)
+- Agents in `.opencode/agents/`
+- Rules in `.opencode/rules/`
+
+**Both platforms share:** memory (`agent-memory/`), docs, Makefile, init.sh
+
+---
+
+## Commands
 
 ```bash
-make init          # Linux/Mac/Git Bash, llama a init.sh
-# o en PowerShell nativo sin Git Bash:
-./init.ps1
-```
-
-Te pregunta nombre, descripcion, stack y tipo de proyecto; renombra `project-architect.md` al agente `[project]-architect` y actualiza `default_agent` en `.opencode/opencode.jsonc`.
-
-**Opcion B — dejar que el agente lo haga:**
-
-Al abrir el proyecto con opencode sin haber corrido `init.sh`, el agente ejecutara el flujo de **Project Clarification** (ver `AGENTS.md`):
-
-1. Define el **nombre** y **descripcion** del proyecto
-2. Elige el **stack** tecnologico (frontend, backend, database, deploy)
-3. Decide la **estructura de carpetas** apropiada
-4. Nombra al **agente arquitecto** principal
-5. Configura los **agentes relevantes** para tu stack
-6. Actualiza `AGENTS.md` con la info del proyecto
-
-### 3. Empezar a desarrollar
-
-Una vez configurado, usa `/start` para cargar contexto y empieza a construir.
-
----
-
-## Agent Harness
-
-| Agente | Funcion | Cuando usarlo |
-|--------|---------|---------------|
-| `[project]-architect` | Orquestador SDD (analiza, delega, decide) | Siempre — punto de entrada, `default_agent` |
-| `spec-writer` | Escribe/actualiza feature specs en `docs/features/` | Siempre, antes de implementar (salvo cambio trivial) |
-| `frontend-developer` | Implementa UI en `apps/web/`, sin TDD | Si hay frontend |
-| `backend-developer` | Implementa API/DB/auth con TDD (Red→Green→Refactor) | Si hay backend |
-| `code-reviewer` | Revisa la implementacion contra la spec, solo lectura | Cambios funcionales, antes de commit |
-| `gdpr-auditor` | Busca credenciales expuestas y anti-patrones de seguridad | Si manejas datos de usuarios, en paralelo con code-reviewer |
-| `release-manager` | Analiza el repo y recomienda versionado, no edita | Al preparar un release |
-
-### Flujo de trabajo (SDD + TDD)
-
-```
-Usuario → project-architect analiza la peticion
-              ↓
-         spec-writer crea/actualiza la spec (docs/features/)
-              ↓
-         frontend-developer + backend-developer implementan
-         (backend con TDD; en paralelo si aplica)
-              ↓
-         code-reviewer verifica contra la spec + tests
-         (+ gdpr-auditor en paralelo si hay datos sensibles)
-              ↓
-         project-architect decide: PASS → commit | FAIL → itera
-```
-
-Detalle completo del flujo, excepciones (cambio trivial, bug fix) y criterios de decision en `AGENTS.md` y `.opencode/agents/project-architect.md`.
-
-### Comandos y skills
-
-| Comando | Funcion |
-|---------|---------|
-| `/start` | Carga contexto completo al inicio de sesion |
-| `/end` | Persiste aprendizajes en `session-log.md` |
-
-Los 4 skills en `.opencode/skills/` (`git-advisor`, `post-coding-check`, `security-guard`, `docs-maintainer`) no se disparan solos — cualquier agente los invoca por nombre con la tool `skill` cuando el contexto encaja (ver la `description` de cada uno).
-
----
-
-## Estructura
-
-```
-apps/
-  web/                    Frontend (ajustar nombre segun stack)
-
-services/
-  backend/                Backend (ajustar nombre segun stack)
-
-docs/
-  architecture/           Decisiones tecnicas, diagramas
-  features/               Specs de funcionalidades
-  legal/                  Privacidad, terminos
-  development/            Memoria, session log, deuda tecnica
-
-config/
-  .env.example            Variables de entorno
-
-.opencode/
-  agents/                 Definiciones de agentes
-  commands/               Comandos de sesion (/start, /end)
-  rules/                  Reglas de desarrollo
-  skills/                 Skills especializadas
+make help              # Show all commands
+make init              # Auto-configure project
+make check             # Lint + typecheck + test
+make review            # Code review on last commit
+make audit             # GDPR audit on staged changes
+make agents            # List available agents
+make memory            # Show agent memory status
+make hooks             # Show active hooks
+make ci-status         # Check CI pipeline status
+make ci-enable-basic   # Enable basic CI
+make design-lint       # Validate DESIGN.md
+make design-ref        # Show reference design systems
 ```
 
 ---
 
-## Configurar para tu stack
+## Project Structure
 
-### Frontend
-
-| Framework | Agente | Notas |
-|-----------|--------|-------|
-| Astro | `frontend-guardian` | Ajustar checklist en el agente |
-| Next.js | `frontend-guardian` | Añadir checks de SSR/SSG |
-| React/Vue/Svelte | `frontend-guardian` | Personalizar segun framework |
-| Mobile (React Native) | `frontend-guardian` | Adaptar checks a mobile |
-| Desktop (Tauri/Electron) | `frontend-guardian` | Añadir checks de seguridad nativa |
-
-### Backend
-
-| Tecnologia | Agente | Notas |
-|------------|--------|-------|
-| PocketBase | `backend-guardian` | Collections, rules, migraciones |
-| Node/Express | `backend-guardian` | Routes, middleware, controllers |
-| Python/FastAPI | `backend-guardian` | Endpoints, schemas, migrations |
-| Supabase/Firebase | `backend-guardian` | Tablas, RLS, functions |
-| Go/Rust | `backend-guardian` | Handlers, models, migrations |
-
-### Para añadir un agente nuevo
-
-1. Crear archivo `.md` en `.opencode/agents/`
-2. Incluir frontmatter con `name`, `description`, `mode`, `permission`
-3. Definir areas de expertise y checklist
-4. Referenciarlo en `AGENTS.md` y en el arquitecto principal
-
-### Para eliminar un agente
-
-Borrar el archivo `.md` correspondiente en `.opencode/agents/` y actualizar `AGENTS.md`.
+```
+0.harnes/
+├── .opencode/agents/          # OpenCode agents (7)
+├── .claude/                   # Claude Code config
+│   ├── agents/                # Subagents (6)
+│   ├── commands/              # /start, /end
+│   ├── skills/                # hooks-and-memory
+│   └── settings.json          # Security hooks
+├── agent-memory/              # Shared memory (agnostic)
+├── docs/                      # Template documentation
+├── .husky/                    # Git hooks
+├── .github/workflows/         # CI/CD (disabled)
+├── CLAUDE.md                  # Claude Code context
+├── AGENTS.md                  # OpenCode context
+├── CONTEXT.md                 # Domain glossary
+├── DESIGN.md.template         # Visual design tokens
+├── CODING_STANDARDS.md.template # Code conventions
+├── ATTRIBUTION.md             # Sources and inspirations
+├── Makefile                   # 30+ commands
+└── init.sh                    # Auto-configuration
+```
 
 ---
 
-## Docker (opcional)
+## Design System
 
-El template incluye configuracion Docker basica que puedes adaptar:
+```bash
+# Validate DESIGN.md
+make design-lint
 
-- `docker-compose.yml` — Servicios (ajustar segun stack)
-- `.deploy/Dockerfile.web` — Build del frontend
-- `.dockerignore` — Excluir archivos de la imagen
+# Export to Tailwind
+make design-export-tailwind
+
+# See reference systems (142+ available)
+make design-ref
+```
+
+Reference systems: Material, Apple, Ant, Shadcn, Tailwind, Vercel, Linear, Notion, Spotify, Airbnb, BMW, Canva, Discord, GitHub, IBM, MongoDB, NVIDIA, OpenAI, Shopify, Stripe, Tesla, Uber...
+
+Source: [Open Design](https://github.com/nexu-io/open-design) (80k+ ⭐)
 
 ---
 
-## CI/CD (opcional)
+## Git Hooks
 
-`.github/workflows/ci.yml` — Pipeline basico. Ajustar los comandos de build/test segun tu stack.
+**pre-commit:** Detects secrets, warns about console.log
+**commit-msg:** Validates conventional commits
+
+```bash
+# Commit format
+feat(auth): add user authentication
+fix(api): handle null response
+docs: update deployment guide
+```
 
 ---
 
-## Scripts
+## CI/CD
 
-| Archivo | Plataforma | Uso |
-|---------|------------|-----|
-| `init.sh` | Linux/Mac/Git Bash | Setup interactivo inicial (via `make init`) |
-| `init.ps1` | Windows PowerShell nativo | Lo mismo que `init.sh`, sin depender de bash |
-| `Makefile` | Linux/Mac/Git Bash | `make help` para ver todos los comandos |
-| `scripts/dev.ps1` | Windows PowerShell nativo | Equivalente a `make dev` |
+Both pipelines are **disabled by default**:
 
-Son templates — los comandos reales (`npm run dev`, `cd apps/web`, etc.) hay que ajustarlos al stack elegido tras el `init`.
+```bash
+make ci-status         # Check what's enabled
+make ci-enable-basic   # Lint + test (fast)
+make ci-enable-advanced # + security + coverage + Docker
+make ci-disable        # Disable all
+```
+
+---
+
+## Inspiration
+
+| Pattern | Source |
+|---------|--------|
+| 2-axis code review | [Matt Pocock](https://github.com/mattpocock/skills) (180k ⭐) |
+| Grilling mode | Matt Pocock |
+| DESIGN.md tokens | [Google](https://github.com/google-labs-code/design.md) (26k ⭐) |
+| Design system refs | [Open Design](https://github.com/nexu-io/open-design) (80k ⭐) |
+| Conventional Commits | [Angular/Google](https://www.conventionalcommits.org/) |
+| Husky + commitlint | [Typicode](https://typicode.github.io/husky/) |
+
+See [ATTRIBUTION.md](ATTRIBUTION.md) for full documentation.
+
+---
+
+## What's Missing
+
+See [HARNESS_SUMMARY.md](docs/development/HARNESS_SUMMARY.md) for prioritized improvement suggestions.
 
 ---
 
 ## License
 
-Template libre para uso personal y comercial. Modifica lo que necesites.
+MIT — use it for anything.

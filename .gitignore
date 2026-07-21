@@ -105,3 +105,6 @@ playwright-report/
 .claude/agent-memory-local/
 .claude/agent-activity.log
 CLAUDE.local.md
+
+# Agent memory local (no compartido)
+agent-memory-local/

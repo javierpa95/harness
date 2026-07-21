@@ -236,3 +236,50 @@ Con un docs-auditor:
 - Claude Code NO tiene `primary` — el system prompt principal es el architect
 - En Claude Code, `.claude/agents/` son TODOS subagentes
 - El architect en Claude Code vive en `CLAUDE.md`, no como archivo separado
+
+---
+
+## DESIGN.md y Coding Standards
+
+### Fuentes
+
+| Fuente | Que se uso | Link | Stars |
+|--------|-----------|------|-------|
+| Google DESIGN.md | Formato de tokens de diseño visual | https://github.com/google-labs-code/design.md | 26k |
+| Open Design | 142+ design systems como referencias | https://github.com/nexu-io/open-design | 80k |
+| Matt Pocock | Patrón de spec files para agentes | https://github.com/mattpocock/skills | 180k |
+
+### Design Systems disponibles como referencia
+
+| Sistema | Tipo | Ideal para |
+|---------|------|-----------|
+| Material | Corporate, limpio | Apps de negocio, dashboards |
+| Apple | Minimal, premium | Apps consumer, SaaS |
+| Ant | Enterprise, functional | Admin panels, tools |
+| Shadcn | Modern, developer-friendly | Startups, MVPs |
+| Tailwind | Utility-first, flexible | Cualquier proyecto |
+| Vercel | Minimal, dark mode | Developer tools |
+| Linear | Clean, productivity | Project management |
+| Notion | Simple, content-focused | Wikis, docs |
+| Spotify | Bold, colorful | Consumer apps |
+
+### CODING_STANDARDS.md
+
+Inspirado en:
+- Google TypeScript Style Guide
+- Airbnb JavaScript Style Guide
+- Rust API Guidelines
+- Python PEP 8
+
+### Patrón: Agent-Native Spec Files
+
+```
+SOUL.md        →  Personalidad del agente
+SKILL.md       →  Instrucciones de tarea
+AGENTS.md      →  Convenciones del proyecto
+DESIGN.md      →  Tokens de diseño visual
+CONTEXT.md     →  Glosario de dominio
+CODING_STANDARDS.md → Convenciones de código
+```
+
+Principio: **Separar la especificación (QUÉ) de la ejecución (CÓMO).**

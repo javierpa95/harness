@@ -140,6 +140,70 @@ case "$DEP_NUM" in
   *) DEPLOY="Docker" ;;
 esac
 
+# ── Design System ──
+echo ""
+echo -e "${GREEN}🎨 Design System${NC}"
+
+if [ "$FRONTEND" != "None" ]; then
+  echo -e "  ${YELLOW}Do you want a DESIGN.md (visual design tokens)?${NC}"
+  echo "    1) Yes — use a reference design system"
+  echo "    2) Yes — start from scratch"
+  echo "    3) No — skip (add later)"
+  read -rp "  Select [1-3] (default: 1): " DS_NUM
+  case "$DS_NUM" in
+    1) DESIGN_SYSTEM="reference" ;;
+    2) DESIGN_SYSTEM="scratch" ;;
+    3) DESIGN_SYSTEM="skip" ;;
+    *) DESIGN_SYSTEM="reference" ;;
+  esac
+
+  if [ "$DESIGN_SYSTEM" = "reference" ]; then
+    echo ""
+    echo -e "  ${YELLOW}Choose a reference design system:${NC}"
+    echo "    1)  Material (Google)"
+    echo "    2)  Apple (iOS)"
+    echo "    3)  Ant Design"
+    echo "    4)  Shadcn"
+    echo "    5)  Tailwind"
+    echo "    6)  Vercel"
+    echo "    7)  Linear"
+    echo "    8)  Notion"
+    echo "    9)  Spotify"
+    echo "    10) Custom (you'll define later)"
+    read -rp "  Select [1-10] (default: 1): " REF_NUM
+    case "$REF_NUM" in
+      1) REFERENCE_DESIGN="material" ;;
+      2) REFERENCE_DESIGN="apple" ;;
+      3) REFERENCE_DESIGN="ant" ;;
+      4) REFERENCE_DESIGN="shadcn" ;;
+      5) REFERENCE_DESIGN="tailwind" ;;
+      6) REFERENCE_DESIGN="vercel" ;;
+      7) REFERENCE_DESIGN="linear" ;;
+      8) REFERENCE_DESIGN="notion" ;;
+      9) REFERENCE_DESIGN="spotify" ;;
+      10) REFERENCE_DESIGN="custom" ;;
+      *) REFERENCE_DESIGN="material" ;;
+    esac
+  fi
+else
+  DESIGN_SYSTEM="skip"
+  REFERENCE_DESIGN="none"
+fi
+
+echo ""
+echo -e "${GREEN}📐 Coding Standards${NC}"
+echo -e "  ${YELLOW}Include CODING_STANDARDS.md?${NC}"
+echo "    1) Yes — full standards"
+echo "    2) Minimal — just naming conventions"
+echo "    3) No — use AGENTS.md only"
+read -rp "  Select [1-3] (default: 1): " CS_NUM
+case "$CS_NUM" in
+  1) CODING_STANDARDS="full" ;;
+  2) CODING_STANDARDS="minimal" ;;
+  3) CODING_STANDARDS="skip" ;;
+  *) CODING_STANDARDS="full" ;;
+esac
+
 # ── Generate variables ──
 ARCHITECT_NAME="${PROJECT_NAME}-architect"
 STACK_SUMMARY="${FRONTEND} + ${BACKEND} + ${DATABASE}"
@@ -278,6 +342,29 @@ EOF
 
 echo -e "  ${GREEN}✓ prompt.md generated${NC}"
 
+# ── 10. Copy DESIGN.md template ──
+if [ "$DESIGN_SYSTEM" != "skip" ] && [ -f "DESIGN.md.template" ]; then
+  cp "DESIGN.md.template" "DESIGN.md"
+  sed -i "s/\[PROJECT_NAME\]/${PROJECT_NAME}/g" DESIGN.md
+  sed -i "s/\[DESCRIBE THE VISUAL IDENTITY.*/${REFERENCE_DESIGN} design system reference/g" DESIGN.md
+  echo -e "  ${GREEN}✓ DESIGN.md created (reference: ${REFERENCE_DESIGN})${NC}"
+  echo -e "  ${YELLOW}  → Edit DESIGN.md to match your brand${NC}"
+fi
+
+# ── 11. Copy CODING_STANDARDS.md template ──
+if [ "$CODING_STANDARDS" != "skip" ] && [ -f "CODING_STANDARDS.md.template" ]; then
+  cp "CODING_STANDARDS.md.template" "CODING_STANDARDS.md"
+  sed -i "s/\[PROJECT_NAME\]/${PROJECT_NAME}/g" CODING_STANDARDS.md
+  sed -i "s/\[STACK_TECH\]/${STACK_SUMMARY}/g" CODING_STANDARDS.md
+  sed -i "s/\[DATE\]/${DATE}/g" CODING_STANDARDS.md
+  echo -e "  ${GREEN}✓ CODING_STANDARDS.md created (${CODING_STANDARDS})${NC}"
+fi
+
+# ── 12. Update .gitignore for templates ──
+echo "" >> .gitignore
+echo "# Templates (not tracked)" >> .gitignore
+echo "*.template" >> .gitignore
+
 # ── Summary ──
 echo ""
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -293,6 +380,12 @@ echo "    ✓ Stack-specific agents configured"
 echo "    ✓ README.md (placeholders filled)"
 echo "    ✓ Makefile (project name)"
 echo "    ✓ prompt.md (for agent to finish setup)"
+if [ "$DESIGN_SYSTEM" != "skip" ]; then
+  echo "    ✓ DESIGN.md (visual tokens: ${REFERENCE_DESIGN})"
+fi
+if [ "$CODING_STANDARDS" != "skip" ]; then
+  echo "    ✓ CODING_STANDARDS.md (${CODING_STANDARDS})"
+fi
 echo ""
 echo -e "  ${YELLOW}Next steps:${NC}"
 echo "    1. Open in OpenCode or Claude Code"

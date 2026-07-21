@@ -3,7 +3,7 @@
 # Works on Linux, Mac, and Windows via Git Bash (make ships a POSIX shell there).
 # Native PowerShell without Git Bash: use init.ps1 / scripts/dev.ps1 directly instead of make.
 
-.PHONY: help init dev install build test lint format typecheck check docker-up docker-down docker-logs docker-restart docker-build docker-clean check-secrets agents memory hooks audit review backend-test git-setup git-lint-commits git-lint-all ci-enable ci-enable-basic ci-enable-advanced ci-disable ci-status clean
+.PHONY: help init dev install build test lint format typecheck check docker-up docker-down docker-logs docker-restart docker-build docker-clean check-secrets agents memory hooks audit review backend-test git-setup git-lint-commits git-lint-all ci-enable ci-enable-basic ci-enable-advanced ci-disable ci-status design-lint design-export-tailwind design-export-dtcg design-ref clean
 
 # ==========================================
 # Variables — Agent fills these in after init
@@ -295,3 +295,29 @@ ci-status: ## Check CI pipeline status
 	else \
 		echo "❌ Advanced CI:  NOT FOUND"; \
 	fi
+
+# ==========================================
+# Design
+# ==========================================
+design-lint: ## Lint DESIGN.md for errors
+	@echo "Linting DESIGN.md..."
+	@npx -y @google/design.md lint DESIGN.md 2>/dev/null || echo "  (requires DESIGN.md)"
+
+design-export-tailwind: ## Export DESIGN.md to Tailwind theme
+	@echo "Exporting to Tailwind..."
+	@npx -y @google/design.md export --format tailwind DESIGN.md > tailwind.theme.json 2>/dev/null || echo "  (requires DESIGN.md)"
+
+design-export-dtcg: ## Export DESIGN.md to W3C DTCG format
+	@echo "Exporting to DTCG..."
+	@npx -y @google/design.md export --format dtcg DESIGN.md > tokens.json 2>/dev/null || echo "  (requires DESIGN.md)"
+
+design-ref: ## Show available reference design systems
+	@echo "Reference Design Systems (from Open Design):"
+	@echo "============================================="
+	@echo ""
+	@echo "  https://github.com/nexu-io/open-design/tree/main/design-systems"
+	@echo ""
+	@echo "  Popular:"
+	@echo "    - material, apple, ant, shadcn"
+	@echo "    - vercel, linear, notion, spotify"
+	@echo "    - tailwind, framer, radix"

@@ -45,6 +45,22 @@
 |----------|-----|--------|
 | [servicio] | [uso] | [variable de entorno] |
 
+### MCP Servers
+
+| MCP | Tipo | Cuándo usar |
+|-----|------|-------------|
+| **CodeGraph** | Local (npx) | Explorar codebase, impacto de cambios, understanding arquitectura |
+| **Context7** | Remote (HTTPS) | Investigar APIs/librerias, ejemplos actualizados |
+| **Engram** | Local (npx) | Memoria persistente entre sesiones, recordar decisiones |
+
+**Configuración:** `.opencode/opencode.jsonc` (sección `mcp`) y `.claude/settings.json`.
+
+**Por defecto deshabilitados:** Cada MCP anade tokens al contexto del LLM. Actívalos solo cuando los necesites.
+
+---
+
+## Decisiones Arquitectônicas
+
 ## Decisiones Arquitectonicas
 
 Ver `docs/architecture/` para ADRs (Architecture Decision Records).

@@ -29,5 +29,37 @@
     },
     "bash": "ask"
   },
+  // ============================================================
+  // MCP Servers
+  // ============================================================
+  // Deshabilitados por defecto: cada MCP anade tokens al contexto
+  // del LLM. Activar solo los que necesites por proyecto.
+  "mcp": {
+    "codegraph": {
+      "type": "local",
+      "command": ["npx", "-y", "@gentlest-mcp/codegraph"],
+      "enabled": false
+    },
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
+      },
+      "enabled": false
+    },
+    "engram": {
+      "type": "local",
+      "command": ["npx", "-y", "@gentlest-mcp/engram"],
+      "enabled": false
+    }
+  },
+  // Deshabilitar todas las tools de MCP por defecto.
+  // Se activan por-agente cuando el architect decide que son necesarias.
+  "tools": {
+    "codegraph_*": false,
+    "context7_*": false,
+    "engram_*": false
+  },
   "default_agent": "project-architect"
 }

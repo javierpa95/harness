@@ -5,16 +5,9 @@ Todos los cambios notables en este proyecto. Formato basado en [Keep a Changelog
 ## [Unreleased]
 
 ### Added
-- [feature nueva]
-
-### Changed
-- [cambio existente]
-
-### Fixed
-- [bug fix]
-
-### Security
-- [fix de seguridad]
+- MCP integration: codegraph, context7, engram servers pre-configured in `.opencode/opencode.jsonc` and `.claude/settings.json`
+- `docs/harness/` educational doc directory with: MCP-integration.md, agents-patterns.md, sdd-advanced.md
+- Agent tool patterns: CodeGraph, Context7, Engram integration with SDD flow
 
 ---
 

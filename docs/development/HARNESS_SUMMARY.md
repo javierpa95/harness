@@ -76,7 +76,19 @@ Un **template de proyecto** para desarrollo asistido por agentes de IA. No es so
 | **Claude Code** | `.claude/` | `CLAUDE.md` (system prompt) |
 | **OpenCode** | `.opencode/` | `project-architect.md` (mode: primary) |
 
-### Memoria Agnóstica
+### MCP Servers (3 integrados)
+
+| MCP | Tipo | Què hace | Estado |
+|-----|------|----------|--------|
+| **CodeGraph** | Local (npx) | Graph del codebase (simbolos, call paths, blast radius) | Deshabilitado por defecto |
+| **Context7** | Remote (HTTPS) | Busca docs de cualquier libreria/framework | Deshabilitado por defecto |
+| **Engram** | Local (npx) | Memoria persistente entre sesiones | Deshabilitado por defecto |
+
+Config en: `.opencode/opencode.jsonc` y `.claude/settings.json`.
+
+> **Importante:** Cada MCP anade tokens al contexto del LLM. Solo activa los que necesites.
+
+### Memoria Agnóstica (shared)
 
 ```
 agent-memory/
@@ -197,7 +209,8 @@ harness/
 │   ├── agents/                ← 6 subagentes
 │   ├── commands/              ← /start, /end
 │   ├── skills/                ← hooks-and-memory
-│   └── settings.json          ← Hooks de seguridad
+│   ├── settings.json          ← Hooks de seguridad + MCP
+│   └── tools.md               ← Herramientas MCP (opcional)
 │
 ├── agent-memory/              ← Memoria compartida
 │   ├── code-reviewer/
@@ -218,6 +231,10 @@ harness/
 │   ├── features/
 │   ├── development/
 │   ├── legal/
+│   ├── harness/                ← Docs educativas del harness
+│   │   ├── MCP-integration.md
+│   │   ├── agents-patterns.md
+│   │   └── sdd-advanced.md
 │   └── CHANGELOG.md
 │
 ├── CLAUDE.md                  ← Contexto Claude Code

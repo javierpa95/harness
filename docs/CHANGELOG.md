@@ -8,3 +8,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 - Project initialization from SDD Agent Harness template
+- Pi SDD harness (`.pi/`): pi-subagents v0.42.1 installed, 7 custom `sdd-*` agents, and the `sdd-orchestrator` extension enforcing the SDD workflow (ANALYZE → SPEC → IMPLEMENT → REVIEW → DECIDE) — complementary to the opencode harness (`.opencode/`)

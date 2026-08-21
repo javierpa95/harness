@@ -1,0 +1,14 @@
+{
+  "name": "sdd-orchestrator",
+  "version": "0.1.0",
+  "description": "SDD workflow orchestrator for pi: ANALYZE -> SPEC -> IMPLEMENT -> REVIEW -> DECIDE. Enforces phase order, manages .pi/sdd-state.json, and delegates to pi-subagents.",
+  "type": "module",
+  "private": true,
+  "pi": {
+    "extensions": ["./index.ts"]
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "dependencies": {}
+}

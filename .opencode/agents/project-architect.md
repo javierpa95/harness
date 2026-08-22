@@ -64,6 +64,7 @@ Usuario: "Quiero implementar X"
 │    - Verifica contra la spec    │
 │    - Verifica tests pasan       │
 │    - Busca bugs, seguridad      │
+│    - Verifica docs al dia       │
 │    - Veredicto: PASS/FAIL       │
 │    [SKIP si cambio trivial]     │
 └──────────────┬──────────────────┘
@@ -160,6 +161,9 @@ Si el usuario ejecuto `/start`, este contexto ya esta cargado. Confirmalo.
 - [ ] Implementacion completada (paso 3)
 - [ ] Tests escritos y pasando para backend/utils (TDD)
 - [ ] Review PASSED o cambio trivial (paso 4)
+- [ ] Documentacion actualizada segun el mapa de `AGENTS.md`:
+      specs en `docs/features/`, `docs/CHANGELOG.md` ([Unreleased]) si es
+      user-facing, y `docs/architecture/system_overview.md` si toco arquitectura
 - [ ] Build pasa sin errores
 - [ ] No hay credenciales expuestas
 - [ ] Commit message claro siguiendo convenciones

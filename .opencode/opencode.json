@@ -14,12 +14,28 @@
       "**/pb_data/*": "deny"
     },
     "edit": {
-      ".opencode/**/*": "deny",
       ".env*": "deny",
       "**/pb_data/**/*": "deny",
       "**/*.db": "deny"
     },
     "bash": "ask"
+  },
+  "mcp": {
+    "codegraph": {
+      "type": "local",
+      "command": ["codegraph", "serve", "--mcp"],
+      "enabled": true
+    },
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "enabled": true
+    },
+    "engram": {
+      "type": "local",
+      "command": ["engram", "mcp", "--tools=agent"],
+      "enabled": true
+    }
   },
   "default_agent": "project-architect"
 }

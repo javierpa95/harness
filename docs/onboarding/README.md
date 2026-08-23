@@ -17,7 +17,8 @@ Bienvenido. Este libro documenta **el harness de opencode** del proyecto: el sis
 | **Nivel cero** — nunca usaste opencode/agentes | Cap 1 → Cap 2 → Cap 3 |
 | **Con experiencia** — ya venís de otros agentes (Claude Code, Cursor, etc.) | Cap 2 y Cap 3; consultá el 1 solo para glosario |
 | **Tenés una duda puntual** (¿qué es un permiso? ¿cómo agrego un MCP?) | Buscá el capítulo/tema en el índice |
-| **Querés contribuir** a evolucionar el harness | Cap 3 + `docs/architecture/system_overview.md` |
+| **Nivel avanzado** — querés adaptar/ampliar el harness | Cap 5 → 6 → 7 |
+| **Querés contribuir** a evolucionar el harness | Cap 3 + Cap 5 + `docs/architecture/system_overview.md` |
 
 ## Índice de capítulos
 
@@ -27,9 +28,9 @@ Bienvenido. Este libro documenta **el harness de opencode** del proyecto: el sis
 | 02 | [El flujo SDD](02-flujo-sdd.md) — el ciclo ANALYZE → SPEC → IMPLEMENT → REVIEW → DECIDE | Nivel 0 | ✔ |
 | 03 | [El harness en la práctica](03-harness-en-practica.md) — cómo trabajar día a día, comandos, dónde vive cada cosa | Nivel 0 | ✔ |
 | 04 | [Setup y configuración](04-setup-configuracion.md) — `make setup`, `harness.settings.jsonc`, por qué un archivo central | Nivel 0 | ✔ |
-| 05 | [Crear y editar agentes](05-crear-editar-agentes.md) — frontmatter, modo primario/subagente, delegación | Avanzado | ⏳ planificado |
-| 06 | [MCP servers](06-servidores-mcp.md) — qué son, cómo agregar/desactivar, servidores del template | Avanzado | ⏳ planificado |
-| 07 | [Mantenimiento del harness](07-mantenimiento-harness.md) — limpiar duplicados, validar config, troubleshooting | Avanzado | ⏳ planificado |
+| 05 | [Crear y editar agentes](05-crear-editar-agentes.md) — frontmatter, modo primario/subagente, delegación, permisos | Avanzado | ✔ |
+| 06 | [MCP servers](06-servidores-mcp.md) — qué son, cómo agregar/desactivar, merge de configs | Avanzado | ✔ |
+| 07 | [Mantenimiento del harness](07-mantenimiento-harness.md) — validar config, escape hatches, troubleshooting | Avanzado | ✔ |
 
 **Leyenda de estado:** ✔ publicado · 🔨 en desarrollo · ⏳ planificado
 

@@ -2,24 +2,25 @@
   // harness.settings.jsonc example - Single Source of Truth for the harness setup.
   //
   // This file centralizes agent configuration. `make setup` applies it to the
-  // .opencode/agents/*.md files (writes `model:` in each frontmatter).
+  // .opencode/agents/*.md files (writes `model:` and `mode:` in frontmatter).
   //
   // If this file does NOT exist under the name `harness.settings.jsonc`,
-  // `make setup` runs in interactive mode and generates it by asking for each
-  // model. Copy this `.example` to `harness.settings.jsonc` and adjust, or
-  // just run `make setup` and let it generate the file for you.
+  // `make setup` runs the interactive TUI and generates it. Copy this `.example`
+  // to `harness.settings.jsonc` and adjust, or run `make setup` and let it generate.
   //
   // "model" format: "provider/model-id" (run `opencode models` to list them).
+  // "mode" format: "primary" | "subagent" | "all" (omit to leave the agent's mode)
   // The values below are illustrative defaults - adjust them to your stack.
 
-  "default_model": "anthropic/claude-sonnet-4-6",
+  "default_model": "nan/deepseek-v4-flash",
 
   "agents": {
-    "spec-writer":          { "model": "anthropic/claude-haiku-4-5" },
-    "frontend-developer":   { "model": "anthropic/claude-sonnet-4-6" },
-    "backend-developer":    { "model": "anthropic/claude-sonnet-4-6" },
-    "code-reviewer":        { "model": "anthropic/claude-haiku-4-5" },
-    "gdpr-auditor":         { "model": "anthropic/claude-haiku-4-5" },
-    "release-manager":      { "model": "anthropic/claude-haiku-4-5" }
+    "spec-writer":          { "model": "nan/deepseek-v4-flash", "mode": "subagent" },
+    "frontend-developer":   { "model": "nan/deepseek-v4-flash" },
+    "backend-developer":    { "model": "nan/deepseek-v4-flash" },
+    "code-reviewer":        { "model": "nan/deepseek-v4-flash" },
+    "gdpr-auditor":         { "model": "nan/deepseek-v4-flash" },
+    "release-manager":      { "model": "nan/deepseek-v4-flash" },
+    "design":               { "model": "nan/deepseek-v4-flash", "mode": "all" }
   }
 }

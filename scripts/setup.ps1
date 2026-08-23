@@ -48,7 +48,7 @@ function ConvertFrom-JsonC {
     return ($clean | ConvertFrom-Json)
 }
 
-# Default / ordered list of roles to configure.
+# Ordered list of roles to configure (subagents + helper agents).
 function Get-RoleDefaults {
     return [ordered]@{
         "spec-writer"        = $null
@@ -57,6 +57,7 @@ function Get-RoleDefaults {
         "code-reviewer"      = $null
         "gdpr-auditor"       = $null
         "release-manager"    = $null
+        "design"             = $null
     }
 }
 
@@ -104,16 +105,23 @@ function Invoke-HarnessTui {
         foreach ($name in @($Providers[$prov])) { $allModels += "$prov/$name" }
     }
 
-    # State per role: index into $allModels, or -1 for none. Preset pre-loads
-    # the current value from harness.settings.jsonc if the model is available.
+    # State per role: index into $allModels (or -1 for none) + mode (null|primary|subagent|all).
+    # Preset pre-loads the current model and mode from harness.settings.jsonc.
     $rows = @()
     foreach ($r in $Roles) {
         $idx = -1
-        if ($Preset -and $Preset.ContainsKey($r)) {
-            $hit = [Array]::IndexOf($allModels, $Preset[$r])
-            if ($hit -ge 0) { $idx = $hit }
+        $mode = $null
+        if ($Preset) {
+            if ($Preset[$r] -is [System.Collections.IDictionary]) {
+                $hit = [Array]::IndexOf($allModels, $Preset[$r].model)
+                if ($hit -ge 0) { $idx = $hit }
+                if ($Preset[$r].mode) { $mode = $Preset[$r].mode }
+            } else {
+                $hit = [Array]::IndexOf($allModels, $Preset[$r])
+                if ($hit -ge 0) { $idx = $hit }
+            }
         }
-        $rows += [pscustomobject]@{ name = $r; idx = $idx }
+        $rows += [pscustomobject]@{ name = $r; idx = $idx; mode = $mode }
     }
 
     $cursor  = 0
@@ -126,19 +134,19 @@ function Invoke-HarnessTui {
 
             # -- Draw main list --
             Clear-Host
-            Write-Host "HARNESS SETUP - assign a model to each subagent" -ForegroundColor Cyan
-            Write-Host "UP/DOWN: move     ENTER: pick model     Q/ESC: finish" -ForegroundColor DarkGray
+            Write-Host "HARNESS SETUP - assign model + mode to each agent" -ForegroundColor Cyan
+            Write-Host "UP/DOWN: move     ENTER: pick model     M: cycle mode     Q/ESC: finish" -ForegroundColor DarkGray
             Write-Host ""
             for ($i = 0; $i -lt $rows.Count; $i++) {
-                $modelVal = if ($rows[$i].idx -ge 0) { $allModels[$rows[$i].idx] } else { "(inherit primary)" }
-                $chk = if ($rows[$i].idx -ge 0) { "OK" } else { "  " }
+                $modelVal = if ($rows[$i].idx -ge 0) { $allModels[$rows[$i].idx] } else { "(inherit)" }
+                $modeVal  = if ($rows[$i].mode) { $rows[$i].mode } else { "-" }
                 $mark = if ($i -eq $cursor) { '>' } else { ' ' }
-                $line = ("{0} {1} {2,-24} {3}" -f $mark, $chk, $rows[$i].name, $modelVal)
+                $line = ("{0} {1,-24} model:{2,-24} mode:{3}" -f $mark, $rows[$i].name, $modelVal, $modeVal)
                 if ($i -eq $cursor) { Write-Host $line -ForegroundColor Black -BackgroundColor White }
                 else { Write-Host $line }
             }
             Write-Host ""
-            Write-Host "ENTER on a row picks its model. Models with 30+ entries scroll internally." -ForegroundColor DarkGray
+            Write-Host "M cycles: (none) -> primary -> subagent -> all -> (none). Empty mode = leaves the file's mode." -ForegroundColor DarkGray
 
             # -- Read a key --
             $key = [Console]::ReadKey($true)
@@ -148,6 +156,12 @@ function Invoke-HarnessTui {
                 'Enter'     {
                     $picked = Show-ModelPicker -All $allModels -Initial $rows[$cursor].idx -Role $rows[$cursor].name
                     if ($picked -ne -2) { $rows[$cursor].idx = $picked }  # -2 means cancelled (keep previous)
+                }
+                'M' {
+                    $cycle = @($null, 'primary', 'subagent', 'all')
+                    $cur = [Array]::IndexOf($cycle, $rows[$cursor].mode)
+                    $next = if ($cur -lt 0 -or $cur -eq $cycle.Count - 1) { 0 } else { $cur + 1 }
+                    $rows[$cursor].mode = $cycle[$next]
                 }
                 'Q'         { $running = $false }
                 'Escape'    { $running = $false }
@@ -159,7 +173,7 @@ function Invoke-HarnessTui {
 
     return @($rows | ForEach-Object {
         $model = if ($_.idx -ge 0) { $allModels[$_.idx] } else { $null }
-        [pscustomobject]@{ name = $_.name; model = $model }
+        [pscustomobject]@{ name = $_.name; model = $model; mode = $_.mode }
     })
 }
 
@@ -202,13 +216,13 @@ function Show-ModelPicker {
     return -2
 }
 
-# Insert or update `model:` in the frontmatter of an agent markdown file.
-function Set-AgentModel {
-    param([string]$Path, [string]$Model)
+# Insert or update a field (model:, mode:) in the frontmatter of an agent file.
+function Set-AgentField {
+    param([string]$Path, [string]$Field, [string]$Value)
     if (-not (Test-Path $Path)) { return $false }
     $lines   = @(Get-Content $Path)
     $inFront = $false
-    $modelIdx = -1
+    $fieldIdx = -1
     $nameIdx  = -1
 
     for ($i = 0; $i -lt $lines.Length; $i++) {
@@ -218,16 +232,16 @@ function Set-AgentModel {
             else { $inFront = $true; continue }
         }
         if (-not $inFront) { continue }
-        if ($l -match '^\s*model\s*:\s*(.*)$') { $modelIdx = $i }
+        if ($l -match ("^" + $Field + "\s*:")) { $fieldIdx = $i }
         elseif ($l -match '^\s*name\s*:') { $nameIdx = $i }
     }
 
-    if ($modelIdx -ge 0) {
-        $lines[$modelIdx] = "model: $Model"
+    if ($fieldIdx -ge 0) {
+        $lines[$fieldIdx] = "${Field}: $Value"
     } elseif ($nameIdx -ge 0) {
         $list = New-Object 'System.Collections.Generic.List[string]'
         $list.AddRange([string[]]$lines)
-        $list.Insert($nameIdx + 1, "model: $Model")
+        $list.Insert($nameIdx + 1, "${Field}: $Value")
         $lines = $list.ToArray()
     } else {
         return $false
@@ -256,22 +270,25 @@ if ($File) {
     # the user sees current picks and can edit them.
     Write-Info "Interactive mode. Detecting available models..."
     $providers = Get-AvailableModels
-    $preAgentModels = @{}
+    $preset = @{}
     if (Test-Path $SettingsFile) {
         $existing = ConvertFrom-JsonC -Content (Get-Content $SettingsFile -Raw)
         if ($existing.agents) {
             foreach ($ap in $existing.agents.PSObject.Properties) {
-                if ($ap.Value.model) { $preAgentModels[$ap.Name] = $ap.Value.model }
+                $preset[$ap.Name] = $ap.Value   # { model?, mode? } subset
             }
         }
     }
 
     $roles = Get-RoleDefaults
-    $states = Invoke-HarnessTui -Roles @($roles.Keys) -Providers $providers -Preset $preAgentModels
+    $states = Invoke-HarnessTui -Roles @($roles.Keys) -Providers $providers -Preset $preset
 
     $out = [ordered]@{}
     foreach ($st in $states) {
-        if ($st.model) { $out[$st.name] = [ordered]@{ model = $st.model } }
+        $entry = [ordered]@{}
+        if ($st.model) { $entry.model = $st.model }
+        if ($st.mode)  { $entry.mode  = $st.mode }
+        if ($entry.Count -gt 0) { $out[$st.name] = $entry }
     }
     $settings = [pscustomobject][ordered]@{
         default_model = if ($out.Count -gt 0) { ($out.Values | Select-Object -First 1).model } else { $null }
@@ -284,19 +301,29 @@ if ($File) {
 
 # Apply
 $agents = $settings.agents
-Write-Info "Applying models..."
+Write-Info "Applying settings..."
 
 foreach ($prop in $agents.PSObject.Properties) {
-    $name  = $prop.Name
-    $model = $prop.Value.model
-    $path  = Join-Path $AgentsDir "$name.md"
-    if (Set-AgentModel -Path $path -Model $model) {
-        Write-Ok "  $name -> $model"
-    } else {
-        Write-Err "  Failed to apply model to $name (file may not exist: $path)"
+    $name = $prop.Name
+    $path = Join-Path $AgentsDir "$name.md"
+    $field = $prop.Value
+
+    if ($field.model) {
+        if (Set-AgentField -Path $path -Field "model" -Value $field.model) {
+            Write-Ok "  $name model -> $($field.model)"
+        } else {
+            Write-Err "  Failed to set model for $name (file may not exist: $path)"
+        }
+    }
+    if ($field.mode) {
+        if (Set-AgentField -Path $path -Field "mode" -Value $field.mode) {
+            Write-Ok "  $name mode  -> $($field.mode)"
+        } else {
+            Write-Err "  Failed to set mode for $name (file may not exist: $path)"
+        }
     }
 }
 
 Write-Info ""
-Write-Info "Done. Restart opencode to load the updated agent models."
-Write-Info "Re-run interactively to change models, or edit $SettingsFile and re-run."
+Write-Info "Done. Restart opencode to load the updated agent config."
+Write-Info "Run `make setup` to change model/mode interactively, or edit $SettingsFile and re-run."

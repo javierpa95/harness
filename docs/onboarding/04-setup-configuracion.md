@@ -15,7 +15,7 @@ make setup
 ```
 
 Qué hace:
-- **`make setup`** → abre la **mini-TUI** de pantalla completa (sin librerías externas). Ves la lista de subagentes con su modelo asignado a la derecha, navegás con **flechas ↑/↓**, presionás **Enter** en una fila para elegir su modelo, y **Q/ESC** para terminar. Al salir guarda `harness.settings.jsonc` y aplica. Carga los valores ya guardados para que lo vuelvas a editar cómodo.
+- **`make setup`** → abre la **mini-TUI** de pantalla completa (sin librerías externas). Ves la lista de agentes con su **modelo** y **modo** (`primary`/`subagent`/`all`) a la derecha. Navegás con **flechas ↑/↓**, presionás **Enter** en una fila para elegir el modelo, **M** para ciclar el modo, y **Q/ESC** para terminar. Al salir guarda `harness.settings.jsonc` y aplica. Carga los valores ya guardados para que los vuelvas a editar cómodo.
 - **`make setup-file`** → modo *file-driven*: aplica lo que dice `harness.settings.jsonc` a los agentes, sin interacción.
 
 > El valor por defecto (`make setup`) es siempre la TUI, para que no tengas que acordarte del formato del archivo. `setup-file` es útil para CI o para re-aplicar una config ya escrita.

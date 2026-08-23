@@ -49,11 +49,15 @@ Una vez configurado, usa `/start` para cargar contexto y empieza a construir.
 
 | Agente | Funcion | Cuando usarlo |
 |--------|---------|---------------|
-| `[project]-architect` | Arquitecto principal (piensa, planifica) | Siempre — punto de entrada |
-| `frontend-guardian` | Analiza cambios en la capa UI | Si hay frontend |
-| `backend-guardian` | Analiza cambios en API/DB/auth | Si hay backend |
+| `[project]-architect` | Arquitecto principal / orquestador SDD | Siempre — punto de entrada |
+| `harness-architect` | Mantiene el propio harness (`.opencode/`) | Para cambios al harness |
+| `spec-writer` | Escribe feature specs | Toda feature |
+| `frontend-developer` | Implementa frontend (UI) | Si hay frontend |
+| `backend-developer` | Implementa backend (TDD) | Si hay backend |
+| `code-reviewer` | Revisa implementacion contra spec | Todo cambio funcional |
 | `gdpr-auditor` | Seguridad y privacidad basica | Si manejas datos de usuarios |
 | `release-manager` | Versionado y releases | Si necesitas control de versiones |
+| `design` | Diseno UX/UI, inspiracion, design.md (mode: all) | Setup inicial / consultas de diseno |
 
 ### Flujo de trabajo
 

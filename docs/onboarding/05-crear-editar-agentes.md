@@ -53,12 +53,14 @@ You are the my-agent. In this project you:
 
 ## Primario vs subagente
 
-| | Primario (`primary`) | Subagente (`subagent`) |
-|---|---|---|
-| Interactúa directo con vos | ✔ (Tab para ciclar) | ✖ |
-| Lo invoca otro agente (Task) | — | ✔ |
-| Lo invocás manualmente con `@nombre` | ✔ | ✔ |
-| Modelo | usa `model` o el global | usa `model` o **el del primario que lo invoca** |
+| | Primario (`primary`) | Subagente (`subagent`) | Ambos (`all`) |
+|---|---|---|---|
+| Interactúa directo con vos | ✔ (Tab) | ✖ | ✔ (Tab) |
+| Lo invoca otro agente (Task) | — | ✔ | ✔ |
+| Lo invocás manualmente con `@nombre` | ✔ | ✔ | ✔ |
+| Modelo | usa `model` o el global | usa `model` o **el del primario** | depende del contexto |
+
+> 💡 **`mode: all`** es ideal para agentes que son importantes en el **setup inicial** (querés hablarse directo con Tab) pero que después solo se consultan de vez en cuando. Es el caso del **agente `design`**: durante el setup inicial lo usás como primario para definir la identidad visual, y después lo invocás con `@design` para pedir una opinión puntual. Sin ocupar un slot permanente en el Tab.
 
 ## Permisos por agente
 

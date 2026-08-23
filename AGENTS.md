@@ -318,6 +318,7 @@ El proyecto usa un harness de agentes de IA para coordinar el desarrollo mediant
 | `code-reviewer` | Revisa implementacion contra spec | `.opencode/agents/code-reviewer.md` |
 | `gdpr-auditor` | Seguridad, privacidad basica | `.opencode/agents/gdpr-auditor.md` |
 | `release-manager` | Versionado, releases, changelog | `.opencode/agents/release-manager.md` |
+| `design` | Diseno UX/UI, inspiracion, design.md (mode: all) | `.opencode/agents/design.md` |
 
 ### Comandos de Sesion
 

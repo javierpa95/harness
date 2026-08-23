@@ -2,7 +2,7 @@
 # The agent fills in actual commands during initialization.
 # Works on Windows (make via choco), Linux, Mac.
 
-.PHONY: help init dev install build test lint format typecheck check docker-up docker-down docker-logs docker-restart docker-build docker-clean check-secrets clean
+.PHONY: help init setup setup-file dev install build test lint format typecheck check docker-up docker-down docker-logs docker-restart docker-build docker-clean check-secrets clean
 
 # ==========================================
 # Variables — Agent fills these in after init
@@ -17,6 +17,8 @@ help: ## Show available commands
 	@echo [PROJECT_NAME] - Development Commands
 	@echo =====================================
 	@echo   make help          Show this message
+	@echo   make setup         Configure agent models (interactive TUI)
+	@echo   make setup-file   Apply models from settings file (no TUI)
 	@echo   make init          Initialize project (interactive)
 	@echo   make dev           Start development servers
 	@echo   make install       Install dependencies
@@ -41,6 +43,14 @@ help: ## Show available commands
 init: ## Initialize project (interactive setup)
 	@echo Running project setup...
 	@if exist init.ps1 (powershell -ExecutionPolicy Bypass -File init.ps1) else (bash init.sh)
+
+setup: ## Configure agent models (interactive TUI)
+	@echo Running harness setup...
+	@powershell -ExecutionPolicy Bypass -File scripts/setup.ps1
+
+setup-file: ## Apply models from harness.settings.jsonc (non-interactive)
+	@echo Applying harness settings from file...
+	@powershell -ExecutionPolicy Bypass -File scripts/setup.ps1 -File
 
 # ==========================================
 # Development

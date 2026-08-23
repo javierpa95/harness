@@ -1,0 +1,25 @@
+{
+  // harness.settings.jsonc example - Single Source of Truth for the harness setup.
+  //
+  // This file centralizes agent configuration. `make setup` applies it to the
+  // .opencode/agents/*.md files (writes `model:` in each frontmatter).
+  //
+  // If this file does NOT exist under the name `harness.settings.jsonc`,
+  // `make setup` runs in interactive mode and generates it by asking for each
+  // model. Copy this `.example` to `harness.settings.jsonc` and adjust, or
+  // just run `make setup` and let it generate the file for you.
+  //
+  // "model" format: "provider/model-id" (run `opencode models` to list them).
+  // The values below are illustrative defaults - adjust them to your stack.
+
+  "default_model": "anthropic/claude-sonnet-4-6",
+
+  "agents": {
+    "spec-writer":          { "model": "anthropic/claude-haiku-4-5" },
+    "frontend-developer":   { "model": "anthropic/claude-sonnet-4-6" },
+    "backend-developer":    { "model": "anthropic/claude-sonnet-4-6" },
+    "code-reviewer":        { "model": "anthropic/claude-haiku-4-5" },
+    "gdpr-auditor":         { "model": "anthropic/claude-haiku-4-5" },
+    "release-manager":      { "model": "anthropic/claude-haiku-4-5" }
+  }
+}

@@ -26,7 +26,7 @@ Bienvenido. Este libro documenta **el harness de opencode** del proyecto: el sis
 | 01 | [Conceptos básicos](01-conceptos-basicos.md) — qué es opencode, el harness, los agentes, MCP, spec | Nivel 0 | ✔ |
 | 02 | [El flujo SDD](02-flujo-sdd.md) — el ciclo ANALYZE → SPEC → IMPLEMENT → REVIEW → DECIDE | Nivel 0 | ✔ |
 | 03 | [El harness en la práctica](03-harness-en-practica.md) — cómo trabajar día a día, comandos, dónde vive cada cosa | Nivel 0 | ✔ |
-| 04 | [Configuración y permisos](04-configuracion-permisos.md) — opencode.json, merge de configs, permisos granulares | Avanzado | 🔨 en desarrollo |
+| 04 | [Setup y configuración](04-setup-configuracion.md) — `make setup`, `harness.settings.jsonc`, por qué un archivo central | Nivel 0 | ✔ |
 | 05 | [Crear y editar agentes](05-crear-editar-agentes.md) — frontmatter, modo primario/subagente, delegación | Avanzado | ⏳ planificado |
 | 06 | [MCP servers](06-servidores-mcp.md) — qué son, cómo agregar/desactivar, servidores del template | Avanzado | ⏳ planificado |
 | 07 | [Mantenimiento del harness](07-mantenimiento-harness.md) — limpiar duplicados, validar config, troubleshooting | Avanzado | ⏳ planificado |

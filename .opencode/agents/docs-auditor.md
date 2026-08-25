@@ -7,11 +7,11 @@ temperature: 0.1
 permission:
   edit: 'deny'
   bash:
+    '*': 'deny'
     'git diff': 'allow'
     'git log': 'allow'
     'git describe': 'allow'
     'grep': 'allow'
-    '*': 'deny'
   read: 'allow'
   question: 'allow'
 tools:

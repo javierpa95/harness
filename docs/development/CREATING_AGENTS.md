@@ -182,8 +182,8 @@ color: '#HEXCODE'
 temperature: 0.2
 permission:
   edit:
-    'ruta/permitida/**/*': 'allow'
     '*': 'deny'
+    'ruta/permitida/**/*': 'allow'
   bash: 'ask'
   read: 'allow'
   question: 'allow'
@@ -235,16 +235,18 @@ Eres el [Nombre] del proyecto. Tu trabajo es [que haces].
 ```yaml
 permission:
   edit:
-    'docs/**/*': 'allow'    # Editar docs
-    'src/**/*': 'ask'       # Preguntar antes de editar src
-    '*': 'deny'             # Denegar todo lo demas
+    '*': 'deny'             # Catch-all PRIMERO
+    'docs/**/*': 'allow'    # Reglas especificas DESPUES (la ultima coincidencia gana)
+    'src/**/*': 'ask'
   bash:
+    '*': 'ask'              # Preguntar para otros comandos
     'git *': 'allow'        # Git sin preguntar
     'npm *': 'allow'        # npm sin preguntar
-    '*': 'ask'              # Preguntar para otros comandos
   read: 'allow'             # Leer todo
   question: 'allow'         # Preguntar al usuario
 ```
+
+> **IMPORTANTE**: La **ULTIMA regla que coincide gana** (doc oficial de Permisos). Si pones el catch-all `'*'` al final, anula todas las whitelists anteriores. Verificado 2026-08-25 en https://opencode.ai/docs/es/permissions/.
 
 ### Diferencias Clave con Claude Code
 

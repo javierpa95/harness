@@ -6,9 +6,9 @@ color: '#8B5CF6'
 temperature: 0.3
 permission:
   edit:
+    '*': 'deny'
     'docs/features/**/*': 'allow'
     'docs/CHANGELOG.md': 'allow'
-    '*': 'deny'
   bash: 'ask'
   read: 'allow'
   question: 'allow'

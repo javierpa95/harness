@@ -6,9 +6,9 @@ color: '#3B82F6'
 temperature: 0.2
 permission:
   edit:
+    '*': 'deny'
     'apps/web/**/*': 'allow'
     'docs/features/**/*': 'allow'
-    '*': 'deny'
   bash: 'ask'
   read: 'allow'
   question: 'allow'

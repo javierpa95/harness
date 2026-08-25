@@ -1,0 +1,2 @@
+# Local only - never commit installed dependencies
+node_modules/

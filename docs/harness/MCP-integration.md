@@ -25,7 +25,7 @@ MCP (Model Context Protocol) es un protocollo estandarizado que permite a los ag
 
 ### 1. Activar/Desactivar MCPs
 
-Los tres MCPs vienen deshabilitados por defecto en el harness. Para activar uno:
+Los tres MCPs vienen **activos por defecto** en el harness (out-of-the-box). Son cero-config:
 
 ```jsonc
 // En .opencode/opencode.jsonc
@@ -33,21 +33,18 @@ Los tres MCPs vienen deshabilitados por defecto en el harness. Para activar uno:
   "mcp": {
     "codegraph": {
       "type": "local",
-      "command": ["npx", "-y", "@gentlest-mcp/codegraph"],
-      "enabled": true  // ← cambiade a true
+      "command": ["npx", "-y", "@astudioplus/codegraph-mcp"],
+      "enabled": true  // activo por defecto
     },
     "context7": {
       "type": "remote",
       "url": "https://mcp.context7.com/mcp",
-      "headers": {
-        "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
-      },
-      "enabled": true  // ← cambiade a true
+      "enabled": true  // activo por defecto (sin API key funciona basico)
     },
     "engram": {
       "type": "local",
-      "command": ["npx", "-y", "@gentlest-mcp/engram"],
-      "enabled": true  // ← cambiade a true
+      "command": ["engram", "mcp", "--tools=agent"],
+      "enabled": true  // activo por defecto
     }
   }
 }
@@ -88,8 +85,8 @@ OpenCode muestra los MCPs disponibles cuando los tienes configurados. Puedes act
 ### CodeGraph
 
 **Tipo:** Local (`npx`)
-**Servicio:** Upstash / Gentle AI
-**Repo:** `@gentlest-mcp/codegraph`
+**Servicio:** CodeGraph (ASTudioplus)
+**Repo:** `@astudioplus/codegraph-mcp`
 
 #### Que hace
 
@@ -130,7 +127,7 @@ Busca docs actualizadas de cualquier libreria, framework, SDK o herramienta. Sop
 #### Como usarlo
 
 1. **Habilitar en config:** `"enabled": true` en `.opencode/opencode.jsonc`
-2. **API key (opcional pero recomendado):** Crear cuenta gratuita en [context7.com](https://context7.com) para obtenir higher rate-limits. La config espera `{env:CONTEXT7_API_KEY}`.
+2. **API key (opcional pero recomendado):** El tier básico funciona sin key. Para mayor rate-limit, crea cuenta gratuita en [context7.com](https://context7.com) y añade `"headers": {"CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"}` en el bloque de context7 de `opencode.jsonc` (definiendo la env var). Si lo añades en opencode, mantenlo en espejo en `.claude/settings.json` con el valor real.
 3. **Usar desde el agente:** Poner `use context7` en el prompt.
 
 #### Ejemplos de uso
@@ -153,13 +150,13 @@ Context7: "Express.js JWT authentication best practices 2026"
 
 ### Engram
 
-**Tipo:** Local (`npx`)
-**Servicio:** Gentle AI
-**Repo:** `@gentlest-mcp/engram`
+**Tipo:** Local (binario nativo)
+**Servicio:** Engram (rawcontext) — binario local `engram`, no es un paquete npm
+**Repo:** `https://github.com/rawcontext/engram`
 
 #### Que hace
 
-Engram es un sistema de memoria persistente basado en vector search. Permite a los agentes de IA recordar lo que hicieron en sesiones anteriores:
+Engram es un sistema de memoria persistente basado en vector search que corre **100% local** (DB en `~/.engram/`). Permite a los agentes de IA recordar lo que hicieron en sesiones anteriores:
 
 - Decisiones tomadas
 - Bugs resueltos
@@ -169,8 +166,8 @@ Engram es un sistema de memoria persistente basado en vector search. Permite a l
 
 #### Como usarlo
 
-1. **Habilitar en config:** `"enabled": true` en `.opencode/opencode.jsonc`
-2. **Setup inicial:** La primera vez que se usa, Engram crea una base de datos local en `~/.opencode/engram.db` (o similar).
+1. **Habilitar en config:** `"enabled": true` en `.opencode/opencode.jsonc` (por defecto).
+2. **Binario:** requiere `engram` instalado (local). Instalarlo aparte; el harness no instala binarios globales.
 3. **Usar desde el agente:** Los agentes usan las herramientas `mem_save`, `mem_search`, `mem_session_summary` etc.
 
 #### Cuándo usarlo
@@ -200,17 +197,14 @@ Para Claude Code, la config de MCP va en `mcpServers` dentro de `.claude/setting
   "mcpServers": {
     "codegraph": {
       "command": "npx",
-      "args": ["-y", "@gentlest-mcp/codegraph"]
+      "args": ["-y", "@astudioplus/codegraph-mcp"]
     },
     "context7": {
-      "url": "https://mcp.context7.com/mcp",
-      "headers": {
-        "CONTEXT7_API_KEY": "tu-api-key-aqui"  // o dejar vacio para uso basico
-      }
+      "url": "https://mcp.context7.com/mcp"
     },
     "engram": {
-      "command": "npx",
-      "args": ["-y", "@gentlest-mcp/engram"]
+      "command": "engram",
+      "args": ["mcp", "--tools=agent"]
     }
   }
 }

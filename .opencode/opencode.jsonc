@@ -32,34 +32,33 @@
   // ============================================================
   // MCP Servers
   // ============================================================
-  // Deshabilitados por defecto: cada MCP anade tokens al contexto
-  // del LLM. Activar solo los que necesites por proyecto.
+  // Activos por defecto (out-of-the-box): el harness se comparte
+  // y quiere funcionar sin config manual.
+  //   - CodeGraph: se instala via npx -y (@astudioplus/codegraph-mcp)
+  //   - Context7:  remote publico, funciona sin API key (basico)
+  //   - Engram:    binario local nativo (`engram mcp`), DB en ~/.engram
   "mcp": {
     "codegraph": {
       "type": "local",
-      "command": ["npx", "-y", "@gentlest-mcp/codegraph"],
-      "enabled": false
+      "command": ["npx", "-y", "@astudioplus/codegraph-mcp"],
+      "enabled": true
     },
     "context7": {
       "type": "remote",
       "url": "https://mcp.context7.com/mcp",
-      "headers": {
-        "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
-      },
-      "enabled": false
+      "enabled": true
     },
     "engram": {
       "type": "local",
-      "command": ["npx", "-y", "@gentlest-mcp/engram"],
-      "enabled": false
+      "command": ["engram", "mcp", "--tools=agent"],
+      "enabled": true
     }
   },
-  // Deshabilitar todas las tools de MCP por defecto.
-  // Se activan por-agente cuando el architect decide que son necesarias.
+  // Tools de MCP habilitadas por defecto (mismo criterio out-of-the-box).
   "tools": {
-    "codegraph_*": false,
-    "context7_*": false,
-    "engram_*": false
+    "codegraph_*": true,
+    "context7_*": true,
+    "engram_*": true
   },
   "default_agent": "project-architect"
 }

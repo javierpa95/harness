@@ -4,8 +4,11 @@ Todos los cambios notables en este proyecto. Formato basado en [Keep a Changelog
 
 ## [Unreleased]
 
+### Fixed
+- MCP servers: fix npm 404 packages. CodeGraph now uses `@astudioplus/codegraph-mcp`; Engram uses the native local binary `engram mcp --tools=agent` (no longer the nonexistent `@gentlest-mcp/*`). All three MCPs (codegraph, context7, engram) now active by default for an out-of-the-box harness in both `.opencode/opencode.jsonc` and `.claude/settings.json`.
+
 ### Added
-- MCP integration: codegraph, context7, engram servers pre-configured in `.opencode/opencode.jsonc` and `.claude/settings.json`
+- MCP integration: codegraph, context7, engram servers pre-configured and enabled in `.opencode/opencode.jsonc` and `.claude/settings.json`
 - `docs/harness/` educational doc directory with: MCP-integration.md, agents-patterns.md, sdd-advanced.md
 - Agent tool patterns: CodeGraph, Context7, Engram integration with SDD flow
 

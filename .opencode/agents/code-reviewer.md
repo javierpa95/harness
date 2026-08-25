@@ -5,17 +5,20 @@ mode: subagent
 color: '#F59E0B'
 temperature: 0.1
 permission:
-  edit: 'deny'
+  edit:
+    '*': 'deny'
+    'agent-memory/code-reviewer/**/*': 'allow'
   bash:
     '*': 'deny'
     'git diff': 'allow'
+    'git diff *': 'allow'
     'git diff --cached': 'allow'
+    'git diff --cached *': 'allow'
     'git grep': 'allow'
+    'git grep *': 'allow'
     'grep -r': 'allow'
-  read: 'allow'
+    'grep -r *': 'allow'
   question: 'allow'
-tools:
-  '*': true
 ---
 
 # Code Reviewer — Revisor de Codigo (2 Ejes)

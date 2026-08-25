@@ -9,12 +9,14 @@ permission:
   bash:
     '*': 'deny'
     'git log': 'allow'
+    'git log *': 'allow'
     'git tag': 'allow'
+    'git tag *': 'allow'
     'git diff': 'allow'
-  read: 'allow'
+    'git diff *': 'allow'
+    'git describe': 'allow'
+    'git describe *': 'allow'
   question: 'allow'
-tools:
-  '*': true
 ---
 
 # Release Manager — Gestor de Releases
@@ -90,4 +92,4 @@ Ningun breaking change detectado.
 
 ---
 
-> "Yo analizo el estado del repo. [project]-architect decide si release. build ejecuta el versionado."
+> "Yo analizo el estado del repo. [project]-architect decide si release y ejecuta el versionado junto al usuario."

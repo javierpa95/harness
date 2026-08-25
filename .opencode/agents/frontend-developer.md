@@ -10,10 +10,7 @@ permission:
     'apps/web/**/*': 'allow'
     'docs/features/**/*': 'allow'
   bash: 'ask'
-  read: 'allow'
   question: 'allow'
-tools:
-  '*': true
 ---
 
 # Frontend Developer — Implementador de Frontend

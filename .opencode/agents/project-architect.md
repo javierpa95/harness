@@ -4,14 +4,14 @@ description: Orquestador SDD. Analiza, delega, decide. Obliga a revisar docs ant
 mode: primary
 color: '#6366F1'
 permission:
-  edit: 'allow'
+  edit:
+    '*': 'allow'
+    '.env*': 'deny'
+    '**/.env*': 'deny'
+    '*.env': 'deny'
+    '**/*.env': 'deny'
   bash: 'allow'
-  read: 'allow'
   question: 'allow'
-  plan_enter: 'allow'
-  plan_exit: 'allow'
-tools:
-  '*': true
 ---
 
 # Project Architect — Orquestador SDD

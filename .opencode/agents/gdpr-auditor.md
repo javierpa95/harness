@@ -5,16 +5,18 @@ mode: subagent
 color: '#FF5252'
 temperature: 0.1
 permission:
-  edit: 'deny'
+  edit:
+    '*': 'deny'
+    'agent-memory/gdpr-auditor/**/*': 'allow'
   bash:
     '*': 'deny'
     'git diff --cached': 'allow'
-    'git grep -i': 'allow'
+    'git diff --cached *': 'allow'
+    'git grep': 'allow'
+    'git grep *': 'allow'
     'grep -r': 'allow'
-  read: 'allow'
+    'grep -r *': 'allow'
   question: 'allow'
-tools:
-  '*': true
 ---
 
 # GDPR Auditor — Seguridad y Privacidad

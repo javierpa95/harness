@@ -20,8 +20,6 @@ permission:
   webfetch: 'allow'
   websearch: 'allow'
   question: 'allow'
-tools:
-  '*': true
 ---
 
 # Harness Arquitect — Arquitecto del Propio Harness

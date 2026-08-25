@@ -9,11 +9,9 @@ permission:
     '*': 'deny'
     'services/backend/**/*': 'allow'
     'docs/features/**/*': 'allow'
+    'agent-memory/backend-developer/**/*': 'allow'
   bash: 'ask'
-  read: 'allow'
   question: 'allow'
-tools:
-  '*': true
 ---
 
 # Backend Developer — Implementador con TDD

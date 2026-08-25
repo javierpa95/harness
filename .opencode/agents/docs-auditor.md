@@ -5,17 +5,20 @@ mode: subagent
 color: '#8B5CF6'
 temperature: 0.1
 permission:
-  edit: 'deny'
+  edit:
+    '*': 'deny'
+    'agent-memory/docs-auditor/**/*': 'allow'
   bash:
     '*': 'deny'
     'git diff': 'allow'
+    'git diff *': 'allow'
     'git log': 'allow'
+    'git log *': 'allow'
     'git describe': 'allow'
+    'git describe *': 'allow'
     'grep': 'allow'
-  read: 'allow'
+    'grep *': 'allow'
   question: 'allow'
-tools:
-  '*': true
 ---
 
 # Docs Auditor — Auditor de Documentacion

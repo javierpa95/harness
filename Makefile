@@ -3,7 +3,7 @@
 # Works on Linux, Mac, and Windows via Git Bash (make ships a POSIX shell there).
 # Native PowerShell without Git Bash: use init.ps1 / scripts/dev.ps1 directly instead of make.
 
-.PHONY: help init dev install build test lint format typecheck check docker-up docker-down docker-logs docker-restart docker-build docker-clean check-secrets agents memory hooks audit review backend-test git-setup git-lint-commits git-lint-all ci-enable ci-enable-basic ci-enable-advanced ci-disable ci-status design-lint design-export-tailwind design-export-dtcg design-ref clean
+.PHONY: help init dev install build test lint format typecheck check docker-up docker-down docker-logs docker-restart docker-build docker-clean check-secrets agents models model tui memory hooks audit review backend-test git-setup git-lint-commits git-lint-all ci-enable ci-enable-basic ci-enable-advanced ci-disable ci-status design-lint design-export-tailwind design-export-dtcg design-ref clean
 
 # ==========================================
 # Variables — Agent fills these in after init
@@ -40,6 +40,9 @@ help: ## Show available commands
 	@echo "  Agents"
 	@echo "  ------"
 	@echo "  make agents        List available agents"
+	@echo "  make models        List agents and their configured model"
+	@echo "  make model         Set agent model: make model AGENT=x MODEL=provider/id"
+	@echo "  make tui           Interactive harness menu (experimental)"
 	@echo "  make memory        Show agent memory status"
 	@echo "  make hooks         Show active hooks"
 	@echo "  make review        Run code review on recent changes"
@@ -159,7 +162,16 @@ agents: ## List available agents
 	@ls -1 .claude/agents/*.md 2>/dev/null | xargs -I{} basename {} .md || echo "  (none)"
 	@echo ""
 	@echo "OpenCode agents:"
-	@ls -1 .opencode/agents/*.md 2>/dev/null | xargs -I{} basename {} .md || echo "  (none)"
+	@node .opencode/scripts/harness.mjs models
+
+models: ## List agents and their configured model (alias detail view)
+	@node .opencode/scripts/harness.mjs models
+
+model: ## Set an agent model: make model AGENT=code-reviewer MODEL=anthropic/claude-sonnet-4-6 (or MODEL=inherit)
+	@node .opencode/scripts/harness.mjs model $(AGENT) $(MODEL)
+
+tui: ## Interactive harness menu (experimental v0)
+	@node .opencode/scripts/harness.mjs tui
 
 memory: ## Show agent memory status
 	@echo "Agent Memory:"
@@ -217,36 +229,6 @@ git-lint-commits: ## Lint last commit message
 git-lint-all: ## Lint all commit messages
 	@echo "Linting all commit messages..."
 	@npx commitlint --from HEAD~10 --to HEAD --verbose
-
-# ==========================================
-# CI/CD
-# ==========================================
-ci-enable: ## Enable GitHub Actions CI pipeline
-	@echo "Enabling CI pipeline..."
-	@if [ -f ".github/workflows/ci.yml.disabled" ]; then \
-		mv .github/workflows/ci.yml.disabled .github/workflows/ci.yml; \
-		echo "✅ CI pipeline enabled"; \
-	else \
-		echo "⚠️  CI pipeline already enabled or file not found"; \
-	fi
-
-ci-disable: ## Disable GitHub Actions CI pipeline
-	@echo "Disabling CI pipeline..."
-	@if [ -f ".github/workflows/ci.yml" ]; then \
-		mv .github/workflows/ci.yml .github/workflows/ci.yml.disabled; \
-		echo "✅ CI pipeline disabled"; \
-	else \
-		echo "⚠️  CI pipeline already disabled or file not found"; \
-	fi
-
-ci-status: ## Check CI pipeline status
-	@if [ -f ".github/workflows/ci.yml" ]; then \
-		echo "✅ CI pipeline: ENABLED"; \
-	elif [ -f ".github/workflows/ci.yml.disabled" ]; then \
-		echo "⏸️  CI pipeline: DISABLED (run 'make ci-enable' to activate)"; \
-	else \
-		echo "❌ CI pipeline: NOT FOUND"; \
-	fi
 
 # ==========================================
 # CI/CD (actualizado)

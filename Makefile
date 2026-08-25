@@ -42,7 +42,7 @@ help: ## Show available commands
 	@echo "  make agents        List available agents"
 	@echo "  make models        List agents and their configured model"
 	@echo "  make model         Set agent model: make model AGENT=x MODEL=provider/id"
-	@echo "  make tui           Interactive harness menu (experimental)"
+	@echo "  make tui           Interactive harness dashboard (v1)"
 	@echo "  make memory        Show agent memory status"
 	@echo "  make hooks         Show active hooks"
 	@echo "  make review        Run code review on recent changes"
@@ -170,7 +170,7 @@ models: ## List agents and their configured model (alias detail view)
 model: ## Set an agent model: make model AGENT=code-reviewer MODEL=anthropic/claude-sonnet-4-6 (or MODEL=inherit)
 	@node .opencode/scripts/harness.mjs model $(AGENT) $(MODEL)
 
-tui: ## Interactive harness menu (experimental v0)
+tui: ## Interactive harness dashboard (arrow keys; needs a real terminal)
 	@node .opencode/scripts/harness.mjs tui
 
 memory: ## Show agent memory status

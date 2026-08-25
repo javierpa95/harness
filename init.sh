@@ -255,7 +255,14 @@ echo -e "  ${YELLOW}→ Renaming architect agents...${NC}"
 if [ -f ".opencode/agents/project-architect.md" ]; then
   mv ".opencode/agents/project-architect.md" ".opencode/agents/${ARCHITECT_NAME}.md"
   sed -i "s/^name: project-architect/name: ${ARCHITECT_NAME}/" ".opencode/agents/${ARCHITECT_NAME}.md" 2>/dev/null || true
-  echo -e "  ${GREEN}✓ OpenCode: project-architect.md → ${ARCHITECT_NAME}.md${NC}"
+  echo -e "  ${GREEN}V OpenCode: project-architect.md  ${ARCHITECT_NAME}.md${NC}"
+fi
+
+# Update default_agent in opencode config.
+# Without this, OpenCode silently falls back to the built-in 'build' agent.
+if [ -f ".opencode/opencode.jsonc" ]; then
+  sed -i "s/\"default_agent\": \"project-architect\"/\"default_agent\": \"${ARCHITECT_NAME}\"/" ".opencode/opencode.jsonc"
+  echo -e "  ${GREEN}V OpenCode: default_agent -> ${ARCHITECT_NAME}${NC}"
 fi
 
 # Claude Code — architect is in CLAUDE.md, not a separate file

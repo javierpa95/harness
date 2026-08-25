@@ -328,7 +328,7 @@ El proyecto usa un harness de agentes de IA para coordinar el desarrollo mediant
 | `gdpr-auditor` | Seguridad, privacidad basica | `.opencode/agents/gdpr-auditor.md` |
 | `release-manager` | Versionado, releases, changelog | `.opencode/agents/release-manager.md` |
 | `docs-auditor` | Verifica que cambios de codigo actualizan docs | `.opencode/agents/docs-auditor.md` |
-| `docs-auditor` | Verifica que cambios de codigo actualizan docs | `.opencode/agents/docs-auditor.md` |
+| `harness-arquitect` | Meta-arquitecto: configura y evoluciona el propio harness (permisos, agentes, skills, docs OpenCode) | `.opencode/agents/harness-arquitect.md` |
 
 ### Skills
 
@@ -342,6 +342,7 @@ El proyecto usa un harness de agentes de IA para coordinar el desarrollo mediant
 |-------------------|--------|
 | "Quiero implementar X" | `project-architect` (flujo SDD) |
 | "Tengo una idea" / "Que te parece esto" | `project-architect` (modo grilling) |
+| "Configura/adapta el harness" o dudas de OpenCode/permisos | `harness-arquitect` |
 | "Revisa este codigo" | `code-reviewer` |
 | "Que falta para el release?" | `release-manager` |
 | "Hay problemas de seguridad?" | `gdpr-auditor` |

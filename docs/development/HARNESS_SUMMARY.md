@@ -43,11 +43,12 @@ Un **template de proyecto** para desarrollo asistido por agentes de IA. No es so
 
 ## Qué tiene el harness
 
-### Agentes (8 total)
+### Agentes (9 total)
 
 | Agente | Plataforma | Rol |
 |--------|-----------|-----|
 | **project-architect** | OpenCode (primary) / CLAUDE.md (CC) | Orquestador SDD, decide |
+| **harness-arquitect** | OpenCode (primary) | Meta-arquitecto: configura y evoluciona el propio harness |
 | **spec-writer** | Ambas | Escribe specs en `docs/features/` |
 | **frontend-developer** | Ambas | Implementa UI (sin TDD) |
 | **backend-developer** | Ambas | Implementa API/DB con TDD |
@@ -195,8 +196,9 @@ Después:
 
 ```
 harness/
-├── .opencode/agents/          ← 7 agentes (OpenCode)
+├── .opencode/agents/          ← 9 agentes (OpenCode)
 │   ├── project-architect.md
+│   ├── harness-arquitect.md
 │   ├── spec-writer.md
 │   ├── frontend-developer.md
 │   ├── backend-developer.md

@@ -17,8 +17,8 @@
     },
     // Red de seguridad por defecto para cualquier agente que no declare su
     // propio permiso `edit`. Los agentes SÍ lo declaran (ver .opencode/agents/*.md)
-    // y ese permiso por-agente manda sobre este: project-architect tiene
-    // `edit: allow` sin restricciones y puede tocar .opencode/ igualmente
+    // y ese permiso por-agente manda sobre este: project-architect y
+    // harness-arquitect tienen `edit: allow` sin restricciones y pueden tocar
     // (lo necesita en el Paso 4 del onboarding, aunque lo normal es que
     // ./init.sh ya lo haya hecho antes de la primera sesión).
     "edit": {

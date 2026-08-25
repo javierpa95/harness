@@ -1,3 +1,7 @@
+---
+description: Persiste los aprendizajes de la sesion en docs/development/session-log.md y cierra con resumen.
+---
+
 # /end — Ritual de Cierre de Sesion
 
 ## Descripcion
@@ -27,11 +31,11 @@ Leer `docs/development/session-log.md` para ver el template y la ultima entrada.
 
 ### 3. Append al session-log
 
-Anadir la nueva entrada al final del archivo:
+Anadir la nueva entrada al FINAL de `docs/development/session-log.md` usando la herramienta de edicion apropiada para tu plataforma (Edit/Write en OpenCode; en su defecto, el metodo de append nativo del shell actual — no asumas sintaxis bash si estas en PowerShell).
 
-```bash
-cat << 'EOF' >> docs/development/session-log.md
+Estructura de la entrada:
 
+```markdown
 ## YYYY-MM-DD - <Titulo breve de la sesion>
 
 ### Contexto
@@ -45,7 +49,6 @@ cat << 'EOF' >> docs/development/session-log.md
 
 ### Aprendizajes
 <Respuesta al punto 4>
-EOF
 ```
 
 **Reglas para el append**:

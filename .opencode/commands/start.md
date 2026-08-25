@@ -1,3 +1,7 @@
+---
+description: Carga el contexto completo del proyecto al inicio de sesion (git, memoria, salud). Solo lectura.
+---
+
 # /start — Ritual de Inicio de Sesion
 
 ## Descripcion

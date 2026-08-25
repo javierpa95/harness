@@ -1,7 +1,6 @@
 ---
 name: handoff
-description: Compacta la conversacion actual en un documento de handoff para que otro agente continue el trabajo. Redacta secrets, referencia artifacts por path.
-invocation: user
+description: Use when handing off work to another agent or ending a long session - compacts the current conversation into a handoff document. Redacts secrets and references artifacts by path.
 ---
 
 # Handoff — Documento de Transferencia

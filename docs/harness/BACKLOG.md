@@ -64,6 +64,14 @@ Prioridad propuesta: 🔥 alto | 🧊 medio | ❄️ algún día
 - [x] ~~Permisos de memoria escribible + wildcards bash en agentes~~ (2026-08-25)
 - [x] ~~Bloques CI duplicados en Makefile~~ (2026-08-25)
 - [x] ~~TUI v0 no interactiva a través de make (readline + stdin no-TTY)~~ → dashboard v1 con guard TTY y raw keys (2026-08-25)
+- [x] ~~`make update`: sincronizador harness-vs-proyecto con manifiesto de hashes, mapeo del arquitecto renombrado y conflictos .new~~ (2026-08-25, docs/harness/UPDATE.md)
+
+### Update — siguientes pasos
+
+- [ ] 🧊 Fuente remota: `make update TEMPLATE=https://github.com/user/repo` (shallow clone a temp)
+- [ ] 🧊 Merge guiado de conflictos dentro del TUI (diff lado a lado en consola)
+- [ ] ❄️ Bloques gestionados para Makefile/opencode.jsonc (marcadores # harness:start/end)
+- [ ] ❄️ Deduplicar stripJsonc entre harness.mjs y harness-update.mjs en lib compartida
 
 ---
 

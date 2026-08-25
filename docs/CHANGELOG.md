@@ -17,6 +17,8 @@ Todos los cambios notables en este proyecto. Formato basado en [Keep a Changelog
 - **Project backlog** `docs/BACKLOG.md`: where every not-now idea/debt goes; wired into AGENTS.md workflow rules, `/start` session ritual and the TUI backlog view (press `b` to toggle project/harness source)
 - OpenCode setup detection in `models` command and TUI "Proveedores" view: global+project config merge, authenticated providers from `auth.json` (names only), declared model IDs per provider, json-level agent overrides
 - Interactive dashboard v1: arrow-key navigation, 5 views (Agents & Models with inline model change/inherit, Skills, dual-source Backlog, Providers, Help), git status header; raw keypress rendering with zero dependencies
+- **`make update`**: syncs harness-owned files from a template checkout into existing projects with 4-way classification (install/update/current/conflict via `.opencode/harness-sync.json` manifest), rename-aware architect mapping (reads `default_agent`), conflicts written as `<file>.new` for manual review. Project-owned files are never touched. `make update-dry` previews. See `docs/harness/UPDATE.md`.
+- `fix(harness)`: dashboard crash on launch (`emitKeypressEvents` imported from the wrong readline module); `i` shortcut wired in agents view
 
 ### Fixed
 - MCP servers: fix npm 404 packages. CodeGraph now uses `@astudioplus/codegraph-mcp`; Engram uses the native local binary `engram mcp --tools=agent` (no longer the nonexistent `@gentlest-mcp/*`). All three MCPs (codegraph, context7, engram) now active by default for an out-of-the-box harness in both `.opencode/opencode.jsonc` and `.claude/settings.json`.

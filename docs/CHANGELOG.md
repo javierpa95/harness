@@ -10,10 +10,24 @@ Todos los cambios notables en este proyecto. Formato basado en [Keep a Changelog
 - MCP integration: codegraph, context7, engram servers pre-configured and enabled in `.opencode/opencode.jsonc` and `.claude/settings.json`
 - `docs/harness/` educational doc directory with: MCP-integration.md, agents-patterns.md, sdd-advanced.md
 - Agent tool patterns: CodeGraph, Context7, Engram integration with SDD flow
+- `harness-guide` skill: on-demand onboarding guide for new users (agents, commands, memory, permissions, make tricks)
+- Harness CLI: `.opencode/scripts/harness.mjs` (zero-dep Node) with `models`, `model <agent> <provider/model|inherit>`, `skills`, and an interactive TUI menu (`make tui`, v0)
+- Make targets: `make models`, `make model AGENT=x MODEL=y|inherit`, `make tui`
+- `docs/harness/BACKLOG.md`: evolution backlog for the harness (TUI ideas first)
 
 ### Fixed
 - MCP servers: fix npm 404 packages. CodeGraph now uses `@astudioplus/codegraph-mcp`; Engram uses the native local binary `engram mcp --tools=agent` (no longer the nonexistent `@gentlest-mcp/*`). All three MCPs (codegraph, context7, engram) now active by default for an out-of-the-box harness in both `.opencode/opencode.jsonc` and `.claude/settings.json`.
 - Permission rule ordering in all granular agents: catch-all (`'*'`) now comes FIRST, specific rules AFTER ("last matching rule wins" per official docs); previous ordering silently denied whitelisted commands
+- **CRITICAL**: `init.sh` never updated `default_agent` when renaming project-architect, so clones created on Linux/macOS silently fell back to the built-in `build` agent; init.sh now mirrors init.ps1 behavior
+- Agent permissions audit: code-reviewer/gdpr-auditor/docs-auditor/backend-developer can now write their own `agent-memory/` notes; bash whitelists use exact+wildcard pairs (patterns without `*` only match bare commands); removed flat `read: 'allow'` that bypassed the global `.env*` read deny; project-architect re-denies `.env*` edits
+- Removed dead/deprecated agent config: `tools: {'*': true}` blocks (deprecated since v1.1.1) and unrecognized `plan_enter`/`plan_exit` permission keys
+- handoff skill: removed ignored `invocation` frontmatter field; `/start` and `/end` gained description frontmatter; `/end` no longer assumes bash-only heredoc syntax
+
+### Changed
+- spec-writer no longer edits `docs/CHANGELOG.md` (changelog belongs to developers/docs-maintainer)
+- Removed unused `@opencode-ai/plugin` dependency from `.opencode/` (no plugins exist); `.opencode/.gitignore` is now tracked (was self-ignored) so clones get ignore rules
+- Makefile: removed duplicated legacy CI target block that overrode the updated one
+- Docs synced: AGENTS.md skills/routing tables, CREATING_AGENTS.md (correct global agents path `~/.config/opencode/agent(s)/`, modern template without deprecated fields, bash wildcard rule), opencode-docs.md (agents/skills/schema verified 2026-08-25)
 
 ---
 

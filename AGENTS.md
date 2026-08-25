@@ -334,7 +334,21 @@ El proyecto usa un harness de agentes de IA para coordinar el desarrollo mediant
 
 | Skill | Uso | Archivo |
 |-------|-----|---------|
+| `harness-guide` | Guia de onboarding: como usar el harness | `.opencode/skills/harness-guide/SKILL.md` |
 | `handoff` | Transferir contexto a otro agente | `.opencode/skills/handoff/SKILL.md` |
+| `git-advisor` | Checklist antes de commit/push | `.opencode/skills/git-advisor/SKILL.md` |
+| `post-coding-check` | Verificacion rapida tras programar | `.opencode/skills/post-coding-check/SKILL.md` |
+| `security-guard` | Escaneo de credenciales pre-commit | `.opencode/skills/security-guard/SKILL.md` |
+| `docs-maintainer` | Que docs actualizar tras tocar codigo | `.opencode/skills/docs-maintainer/SKILL.md` |
+
+### Herramientas del Harness (make / scripts)
+
+| Comando | Uso |
+|---------|-----|
+| `make models` | Lista agentes y su modelo configurado |
+| `make model AGENT=x MODEL=y` | Cambia el modelo de un agente (`MODEL=inherit` para heredar) |
+| `make tui` | Menu interactivo del harness (v0) |
+| `.opencode/scripts/harness.mjs` | CLI subyacente (`models`, `model`, `skills`, `tui`) |
 
 ### Tabla de Routing (cuando usar cada agente/skill)
 
@@ -343,6 +357,7 @@ El proyecto usa un harness de agentes de IA para coordinar el desarrollo mediant
 | "Quiero implementar X" | `project-architect` (flujo SDD) |
 | "Tengo una idea" / "Que te parece esto" | `project-architect` (modo grilling) |
 | "Configura/adapta el harness" o dudas de OpenCode/permisos | `harness-arquitect` |
+| "Como uso el harness? / Que puedo hacer?" | Skill `harness-guide` (cualquier agente) |
 | "Revisa este codigo" | `code-reviewer` |
 | "Que falta para el release?" | `release-manager` |
 | "Hay problemas de seguridad?" | `gdpr-auditor` |

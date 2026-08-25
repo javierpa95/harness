@@ -169,7 +169,9 @@ Reporta con severidad: CRITICO, ADVERTENCIA, INFO.
 | Ubicacion | Alcance |
 |-----------|---------|
 | `.opencode/agents/` | Proyecto actual |
-| `~/.opencode/agents/` | Todos tus proyectos (si soportado) |
+| `~/.config/opencode/agent(s)/` | Todos tus proyectos (verificado 2026-08-25 en https://opencode.ai/docs/es/agents/) |
+
+> **OJO**: la ruta global NO es `~/.opencode/agents/` — esa ruta no existe en OpenCode.
 
 ### Formato del Archivo
 
@@ -185,10 +187,7 @@ permission:
     '*': 'deny'
     'ruta/permitida/**/*': 'allow'
   bash: 'ask'
-  read: 'allow'
   question: 'allow'
-tools:
-  '*': true
 ---
 
 # Nombre del Agente
@@ -227,8 +226,12 @@ Eres el [Nombre] del proyecto. Tu trabajo es [que haces].
 | `mode` | No | `primary` (orquestador) o `subagent` (trabajador) |
 | `color` | No | Color HEX para display |
 | `temperature` | No | Temperatura del modelo (0.0-1.0) |
-| `permission` | No | Permisos de edit/bash/read/question |
-| `tools` | No | Herramientas habilitadas |
+| `model` | No | Modelo del agente (`provider/model-id`; sin el, hereda el global). Gestionable con `make model AGENT=x MODEL=y` |
+| `permission` | No | Permisos por herramienta (edit, bash, question, task...) |
+
+> ⚠️ **NO uses `tools:`** en agentes nuevos: esta DEPRECADO desde v1.1.1 (fusionado en `permission`). Verificado 2026-08-25.
+>
+> ⚠️ **NO declares `read: 'allow'`**: los permisos del agente tienen prioridad sobre los globales, asi que anularia la red de seguridad global (denegacion de lectura de `.env*`, `pb_data`, etc.). `read` ya es allow por defecto; omitirlo mantiene la proteccion.
 
 ### Permisos en OpenCode
 
@@ -242,11 +245,12 @@ permission:
     '*': 'ask'              # Preguntar para otros comandos
     'git *': 'allow'        # Git sin preguntar
     'npm *': 'allow'        # npm sin preguntar
-  read: 'allow'             # Leer todo
   question: 'allow'         # Preguntar al usuario
 ```
 
-> **IMPORTANTE**: La **ULTIMA regla que coincide gana** (doc oficial de Permisos). Si pones el catch-all `'*'` al final, anula todas las whitelists anteriores. Verificado 2026-08-25 en https://opencode.ai/docs/es/permissions/.
+> **IMPORTANTE 1**: La **ULTIMA regla que coincide gana** (doc oficial de Permisos). Si pones el catch-all `'*'` al final, anula todas las whitelists anteriores. Verificado 2026-08-25 en https://opencode.ai/docs/es/permissions/.
+>
+> **IMPORTANTE 2**: Los patrones de `bash` SIN comodin solo coinciden el comando EXACTO. `'git diff'` no cubre `git diff main..HEAD`. Usa pares: `'git diff': allow` + `'git diff *': allow`. Verificado 2026-08-25.
 
 ### Diferencias Clave con Claude Code
 
@@ -314,7 +318,8 @@ Ambos en paralelo, reportes separados.
 |--------|------|
 | Claude Code Docs — Agents | https://code.claude.com/docs/en/agents |
 | Claude Code — Custom Subagents | https://code.claude.com/docs/en/agents/create-custom-subagents |
-| OpenCode (archived) | https://github.com/opencode-ai/opencode |
+| OpenCode Docs | https://opencode.ai/docs/es/ |
+| OpenCode repo | https://github.com/anomalyco/opencode |
 | Matt Pocock Skills | https://github.com/mattpocock/skills |
 
 ---

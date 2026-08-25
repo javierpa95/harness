@@ -189,8 +189,18 @@ Aunque el git log documenta el avance, la carpeta `docs/` existe para que **nuev
 | Config, deploy, CI/CD | `docs/architecture/deployment.md` |
 | Politicas legales | `docs/legal/*.md` |
 | Cualquier cambio user-facing | `docs/CHANGELOG.md` (seccion `[Unreleased]`) |
+| Ideas o pendientes a futuro | `docs/BACKLOG.md` |
 
 **REGLA**: Si un nuevo desarrollador no puede entender tu cambio leyendo la doc, la doc esta incompleta.
+
+### Backlog del proyecto — docs/BACKLOG.md
+
+El backlog es memoria de futuro: **toda idea, deuda tecnica o pendiente que no se trabaje AHORA se registra ahi**, con prioridad (🔥 alto / 🧊 medio / ❄️ algun dia). Reglas:
+
+- El architect lo revisa al iniciar sesion (`/start`) y decide que se promueve a spec.
+- Un item se trabaja cuando se convierte en spec en `docs/features/` (flujo SDD completo).
+- Al completarse, se mueve a "Hecho" con fecha. Lo user-facing acaba en el CHANGELOG.
+- Nadie borra items sin decidirlo explicitamente: se archivan, no desaparecen.
 
 ---
 
@@ -362,6 +372,7 @@ El proyecto usa un harness de agentes de IA para coordinar el desarrollo mediant
 | "Que falta para el release?" | `release-manager` |
 | "Hay problemas de seguridad?" | `gdpr-auditor` |
 | "Escribe la spec de X" | `spec-writer` |
+| "Esto para mas adelante" / "apuntalo" | Registrar en `docs/BACKLOG.md` |
 | "Necesito que otro agente continue esto" | `handoff` |
 
 ### Comandos de Sesion

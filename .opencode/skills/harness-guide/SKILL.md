@@ -93,8 +93,9 @@ Tras cambiar un modelo, reinicia OpenCode para que aplique.
 ## FAQ rapida
 
 - **"Tengo una idea pero no se por donde empezar"** → Cuéntasela al arquitecto: hara grilling (entrevista) y luego arranca el flujo SDD.
+- **"Tengo ideas para mas adelante"** → Se registran en `docs/BACKLOG.md`; el arquitecto las revisa al inicio de cada sesion (`/start`).
 - **"Por que me pide aprobacion para ejecutar X?"** → Permiso en modo ask. Responde always si confias en ese patron para la sesion.
-- **"Quiero cambiar el modelo de un subagente"** → `make model AGENT=<nombre> MODEL=<provider/model>`.
+- **"Quiero cambiar el modelo de un subagente"** → `make model AGENT=<nombre> MODEL=<provider/model>` (o vista Agentes del dashboard).
 - **"Esto del harness no funciona / quiero cambiar permisos"** → `@harness-arquitect`.
 - **"Donde documento una decision importante?"** → La spec (docs/features/) y el commit; el git log es documentacion viva.
 

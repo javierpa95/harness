@@ -11,9 +11,12 @@ Todos los cambios notables en este proyecto. Formato basado en [Keep a Changelog
 - `docs/harness/` educational doc directory with: MCP-integration.md, agents-patterns.md, sdd-advanced.md
 - Agent tool patterns: CodeGraph, Context7, Engram integration with SDD flow
 - `harness-guide` skill: on-demand onboarding guide for new users (agents, commands, memory, permissions, make tricks)
-- Harness CLI: `.opencode/scripts/harness.mjs` (zero-dep Node) with `models`, `model <agent> <provider/model|inherit>`, `skills`, and an interactive TUI menu (`make tui`, v0)
+- Harness CLI: `.opencode/scripts/harness.mjs` (zero-dep Node) with `models`, `model <agent> <provider/model|inherit>`, `skills`, `backlog [project|harness]`, and an interactive TUI menu (`make tui`, v0)
 - Make targets: `make models`, `make model AGENT=x MODEL=y|inherit`, `make tui`
 - `docs/harness/BACKLOG.md`: evolution backlog for the harness (TUI ideas first)
+- **Project backlog** `docs/BACKLOG.md`: where every not-now idea/debt goes; wired into AGENTS.md workflow rules, `/start` session ritual and the TUI backlog view (press `b` to toggle project/harness source)
+- OpenCode setup detection in `models` command and TUI "Proveedores" view: global+project config merge, authenticated providers from `auth.json` (names only), declared model IDs per provider, json-level agent overrides
+- Interactive dashboard v1: arrow-key navigation, 5 views (Agents & Models with inline model change/inherit, Skills, dual-source Backlog, Providers, Help), git status header; raw keypress rendering with zero dependencies
 
 ### Fixed
 - MCP servers: fix npm 404 packages. CodeGraph now uses `@astudioplus/codegraph-mcp`; Engram uses the native local binary `engram mcp --tools=agent` (no longer the nonexistent `@gentlest-mcp/*`). All three MCPs (codegraph, context7, engram) now active by default for an out-of-the-box harness in both `.opencode/opencode.jsonc` and `.claude/settings.json`.

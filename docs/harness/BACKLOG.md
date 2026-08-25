@@ -27,7 +27,11 @@ Prioridad propuesta: 🔥 alto | 🧊 medio | ❄️ algún día
 
 ### Items concretos
 
+- [x] Deteccion de la instalacion OpenCode en el dashboard/CLI: config global+proyecto, proveedores con auth (solo nombres), modelos declarados en config (2026-08-25)
 - [ ] 🔥 Wizard de modelos con lista de modelos recientes/sugeridos (no tener que teclear el ID)
+      — parcial: el prompt ya lista proveedores auth y modelos declarados; falta catalogo completo
+- [ ] 🧊 Catalogo completo de modelos via https://models.dev/api.json con cache local 24h
+- [x] Backlog de PROYECTO (docs/BACKLOG.md) creado y cableado a AGENTS.md, /start y vista Backlog del TUI (toggle 'b') (2026-08-25)
 - [ ] 🧊 Vista "auditoría": permisos efectivos por agente (merge global+agente) renderizados
 - [ ] 🧊 Toggle on/off de agentes por stack (equivalente visual a borrar el .md, reversible)
 - [ ] 🧊 Editor de permisos por agente (whitelist de rutas editables) con preview del diff

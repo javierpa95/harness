@@ -42,9 +42,20 @@ edicion es tuya. Compara, decide, borra el `.new`.
 - **Arquitecto renombrado**: el template trae `project-architect.md`; el update
   lee `default_agent` del proyecto y lo mapea a `<tu>-architect.md` reescribiendo
   el frontmatter. El renombrado del init sobrevive a las actualizaciones.
+- **Agentes eliminados por init** (p.ej. sin frontend): se RESPETAN las ausencias
+  y no se reinstalan; aparecen en el reporte como "Ausentes localmente". Para
+  recuperarlos: `make update TEMPLATE=... RESTORE=1`.
 - **`opencode.jsonc`**: contiene `default_agent` y permisos propios → jamas se
   sobrescribe. Si una version del template anade claves nuevas, se avisa en el
   reporte para merge manual.
+
+## Por que NO se borra todo y se pega la plantilla
+
+1. Romperia el renombrado (`default_agent` apuntaria a un agente inexistente →
+   OpenCode caeria silenciosamente al built-in `build`).
+2. Reinstalaria agentes que init elimino deliberadamente segun tu stack.
+3. Pisaria ediciones locales de agentes/skills — para eso existe el sistema de
+   conflictos `.new`.
 
 ## Limitaciones conocidas (backlog)
 

@@ -178,11 +178,11 @@ model: ## Set an agent model: make model AGENT=code-reviewer MODEL=anthropic/cla
 tui: ## Interactive harness dashboard (arrow keys; needs a real terminal)
 	@node .opencode/scripts/harness.mjs tui
 
-update: ## Update harness files from the template: make update TEMPLATE=<ruta/al/template>
-	@node .opencode/scripts/harness-update.mjs --template "$(TEMPLATE)"
+update: ## Update harness files from the template: make update TEMPLATE=<ruta> (RESTORE=1 reinstalls deleted agents)
+	@node .opencode/scripts/harness-update.mjs --template "$(TEMPLATE)" $(RESTORE)
 
 update-dry: ## Preview what update would do, without writing
-	@node .opencode/scripts/harness-update.mjs --template "$(TEMPLATE)" --dry
+	@node .opencode/scripts/harness-update.mjs --template "$(TEMPLATE)" --dry $(RESTORE)
 
 memory: ## Show agent memory status
 	@echo "Agent Memory:"

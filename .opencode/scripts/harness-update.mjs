@@ -143,6 +143,10 @@ const getArg = (name) => {
   return i >= 0 ? args[i + 1] : null;
 };
 const dry = args.includes('--dry');
+// init.sh/ps1 may have DELETED stack-irrelevant agents (e.g. no frontend).
+// By default we respect those deletions and never reinstall them; the flag
+// opts in to restoring every agent the template ships.
+const restoreAgents = args.includes('--restore-agents');
 
 // The project being updated defaults to cwd but must be explicit-able, since
 // this script can also be invoked from the template checkout itself.
@@ -170,7 +174,7 @@ if (!fs.existsSync(path.join(tplRoot, '.opencode', 'agents'))) {
 }
 
 const targets = buildSyncList(tplRoot, tgtRoot);
-const result = { install: [], update: [], current: [], conflict: [] };
+const result = { install: [], update: [], current: [], conflict: [], absent: [] };
 
 for (const t of targets) {
   const tplHash = sha256(t.src);
@@ -179,7 +183,11 @@ for (const t of targets) {
   const prevHash = manifest.files[t.rel] || null;
 
   let action;
-  if (!existsDst) action = 'install';
+  if (!existsDst) {
+    // Missing locally. If init/user removed an agent on purpose, respect it;
+    // otherwise treat as a brand-new file from the template.
+    action = (!restoreAgents && t.rel.startsWith('.opencode/agents/')) ? 'absent' : 'install';
+  }
   else if (curHash === tplHash) action = 'current';
   else if (prevHash && prevHash === curHash) action = 'update';
   else action = 'conflict'; // locally modified (or first sync of a modified file)
@@ -197,6 +205,8 @@ for (const t of targets) {
       if (t.transform) content = t.transform(content);
       fs.writeFileSync(newPath, content, 'utf8');
       // Manifest NOT advanced: the local file stays flagged until resolved.
+    } else if (action === 'absent') {
+      delete manifest.files[t.rel]; // stop tracking; stays absent until --restore-agents
     } else if (action === 'current' && prevHash !== tplHash) {
       manifest.files[t.rel] = tplHash;
     }
@@ -232,6 +242,14 @@ section('Instalados', result.install);
 section('Actualizados', result.update);
 section('Ya al dia', result.current);
 
+if (result.absent.length) {
+  console.log('');
+  console.log(`Ausentes localmente — respetados (${result.absent.length})`);
+  console.log('  (init los elimino para tu stack, o los borraste a proposito)');
+  for (const rel of result.absent) console.log(`  ${rel}`);
+  console.log('  Para reinstalarlos: make update TEMPLATE=... RESTORE=1');
+}
+
 if (result.conflict.length) {
   console.log('');
   console.log(`CONFLICTOS (${result.conflict.length}) — cambiaste estos archivos Y el template tambien:`);
@@ -250,6 +268,7 @@ console.log('');
 console.log('Siguientes pasos:');
 if (!dry) console.log('  1. Reinicia OpenCode para recargar agentes/skills/permisos.');
 if (result.conflict.length) console.log('  2. Revisa los .new y resuelve los conflictos.');
+if (result.absent.length) console.log('  - Agentes ausentes respetados; RESTORE=1 si quieres recuperarlos.');
 if (dry) console.log('  - Ejecutalo en firme sin --dry cuando estes conforme.');
 console.log(`  - Manifiesto: ${MANIFEST_REL} (commitealo para trazabilidad)`);
 

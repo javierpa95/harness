@@ -81,13 +81,13 @@ Un **template de proyecto** para desarrollo asistido por agentes de IA. No es so
 
 | MCP | Tipo | Què hace | Estado |
 |-----|------|----------|--------|
-| **CodeGraph** | Local (npx) | Graph del codebase (simbolos, call paths, blast radius) | Deshabilitado por defecto |
-| **Context7** | Remote (HTTPS) | Busca docs de cualquier libreria/framework | Deshabilitado por defecto |
-| **Engram** | Local (npx) | Memoria persistente entre sesiones | Deshabilitado por defecto |
+| **CodeGraph** | Local (npx -y) | Graph del codebase (simbolos, call paths, blast radius) | Activo por defecto |
+| **Context7** | Remote (HTTPS) | Busca docs de cualquier libreria/framework | Activo por defecto |
+| **Engram** | Local (binario nativo `engram mcp`/`~/.engram`) | Memoria persistente entre sesiones | Activo por defecto |
 
 Config en: `.opencode/opencode.jsonc` y `.claude/settings.json`.
 
-> **Importante:** Cada MCP anade tokens al contexto del LLM. Solo activa los que necesites.
+> **Nota:** Los 3 MCPs vienen activos por defecto (out-of-the-box). Cada MCP anade tokens al contexto del LLM: si te sobran, desactiva el que no necesites en `opencode.jsonc`.
 
 ### Memoria Agnóstica (shared)
 

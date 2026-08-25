@@ -47,15 +47,15 @@
 
 ### MCP Servers
 
-| MCP | Tipo | Cuándo usar |
+| MCP | Tipo | Cuánto usar |
 |-----|------|-------------|
-| **CodeGraph** | Local (npx) | Explorar codebase, impacto de cambios, understanding arquitectura |
+| **CodeGraph** | Local (`npx -y @astudioplus/codegraph-mcp`) | Explorar codebase, impacto de cambios, understanding arquitectura |
 | **Context7** | Remote (HTTPS) | Investigar APIs/librerias, ejemplos actualizados |
-| **Engram** | Local (npx) | Memoria persistente entre sesiones, recordar decisiones |
+| **Engram** | Local (binario nativo `engram mcp`) | Memoria persistente entre sesiones, recordar decisiones |
 
 **Configuración:** `.opencode/opencode.jsonc` (sección `mcp`) y `.claude/settings.json`.
 
-**Por defecto deshabilitados:** Cada MCP anade tokens al contexto del LLM. Actívalos solo cuando los necesites.
+**Por defecto habilitados (out-of-the-box):** los 3 MCPs vienen activos al clonar el harness. Cada MCP anade tokens al contexto del LLM; desactiva el que no necesites en `opencode.jsonc`.
 
 ---
 

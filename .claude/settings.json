@@ -44,22 +44,20 @@
   },
   // ============================================================
   // MCP Servers — Mirror de .opencode/opencode.jsonc
-  // Deshabilitados por defecto — habilitar los que necesites
+  // Activos por defecto (out-of-the-box). Engram usa el binario
+  // local nativo; CodeGraph se instala via npx -y.
   // ============================================================
   "mcpServers": {
     "codegraph": {
       "command": "npx",
-      "args": ["-y", "@gentlest-mcp/codegraph"]
+      "args": ["-y", "@astudioplus/codegraph-mcp"]
     },
     "context7": {
-      "url": "https://mcp.context7.com/mcp",
-      "headers": {
-        "CONTEXT7_API_KEY": ""
-      }
+      "url": "https://mcp.context7.com/mcp"
     },
     "engram": {
-      "command": "npx",
-      "args": ["-y", "@gentlest-mcp/engram"]
+      "command": "engram",
+      "args": ["mcp", "--tools=agent"]
     }
   },
   "hooks": {

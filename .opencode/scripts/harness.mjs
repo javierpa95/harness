@@ -12,7 +12,8 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import readline from 'node:readline/promises';
+import readlinePromises from 'node:readline/promises'; // promise-based question()
+import { emitKeypressEvents } from 'node:readline'; // raw key events (NOT in /promises)
 import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
@@ -226,7 +227,7 @@ function boxLine(content, width = WIDTH) {
 }
 
 function enableRawMode() {
-  readline.emitKeypressEvents(process.stdin);
+  emitKeypressEvents(process.stdin);
   process.stdin.setRawMode(true);
   process.stdin.resume();
 }
@@ -250,7 +251,7 @@ function nextKey() {
 async function askLine(question) {
   // Cooked mode for text input.
   disableRawMode();
-  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  const rl = readlinePromises.createInterface({ input: process.stdin, output: process.stdout });
   try {
     return (await rl.question(question)).trim();
   } finally {
@@ -414,6 +415,10 @@ async function cmdTui() {
         const count = agents().length;
         if (key.name === 'up') cursor = (cursor - 1 + count) % count;
         else if (key.name === 'down') cursor = (cursor + 1) % count;
+        else if (key.name === 'i') {
+          const a = agents()[cursor];
+          status = a.model ? applyModelChange(a.file, 'inherit') : `${a.name}: ya hereda.`;
+        }
         else if (key.name === 'return') {
           detail = { type: 'agent-actions', index: cursor, sel: 0 };
           status = 'Accion sobre el agente seleccionado.';

@@ -13,9 +13,17 @@ Prioridad propuesta: 🔥 alto | 🧊 medio | ❄️ algún día
 |--------|-----------|-------|--------|
 | **Node raw actual** (elegida) | Cero deps, viaja en clones sin npm install, ANSI + keypress | Render manual, sin layout complejo | Ahora |
 | `@clack/prompts` | Select/multiselect/spinners preciosos para wizards | Dep nueva en `.opencode/` (+ reinstalar package.json) | Si los flujos se vuelven formularios largos |
-| **Ink (React CLI)** | Dashboard real: paneles, tablas vivas, focus por panel | react+ink, build mental React, deps pesadas | Cuando haya ≥4 paneles vivos o refresco en tiempo real |
+| **Ink (React CLI)** | Dashboard real: paneles, tablas vivas, focus por panel | react+ink (~10-15MB) + **toolchain JSX** (esbuild o Bun — Node no ejecuta JSX nativo) + bootstrap en clones | Cuando haya ≥4 paneles vivos o refresco en tiempo real |
 | Web dashboard local | UI total, gráficos, histórico | Servidor + abrir navegador; sale del flujo de terminal | ❄️ algún día |
 | Plugin OpenCode con hooks | Eventos en vivo del harness (tool calls, permisos denegados) | Aprender API plugins; reinstalar deps `.opencode/` | Cuando queramos auditiva EN VIVO |
+
+### Checklist de adopción de Ink (cuando toque)
+
+1. Recrear `.opencode/package.json` COMMITTEADO con `ink`, `react`, `esbuild` (devDep).
+2. Añadir paso de build: `make tui-build` (esbuild bundle.jsx -> .opencode/scripts/tui.mjs) o evaluar Bun (ejecuta JSX sin build).
+3. init.sh/init.ps1: paso nuevo "npm install --prefix .opencode" para clones.
+4. Migración incremental: la lógica de negocio YA está separada (applyModelChange, agents(), skillSummaries, backlogItems) — solo se reemplaza la capa de render.
+5. Criterio de activación: ≥4 paneles simultáneos, refresco automático, o scroll/listas largas.
 
 ### Items concretos
 

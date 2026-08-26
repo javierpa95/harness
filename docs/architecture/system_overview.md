@@ -1,84 +1,77 @@
-# System Overview — [PROJECT_NAME]
+# System Overview
 
-## Architecture
+**Proyecto:** [PROJECT_NAME]
+**Version:** 0.1.0
+**Ultima actualizacion:** [DATE]
+
+---
+
+## Descripcion General
+
+[Una linea que describe que hace el proyecto]
+
+## Stack
+
+| Capa | Tecnologia | Por que |
+|------|-----------|---------|
+| Frontend | [tecnologia] | [razon] |
+| Backend | [tecnologia] | [razon] |
+| Database | [tecnologia] | [razon] |
+| Deploy | [tecnologia] | [razon] |
+| Auth | [tecnologia] | [razon] |
+
+## Arquitectura
 
 ```
-┌─────────────────────────────────────────┐
-│           [DEPLOYMENT TARGET]            │
-│  ┌──────────────┐    ┌───────────────┐  │
-│  │   Frontend   │◄──►│   Backend     │  │
-│  │   [Port]     │    │   [Port]      │  │
-│  │              │    │               │  │
-│  └──────────────┘    └───────────────┘  │
-└─────────────────────────────────────────┘
+[Diagrama de arquitectura en ASCII o Mermaid]
 ```
-
-> **Actualizar este diagrama** con la arquitectura real del proyecto.
-
-## Components
-
-### Frontend: [FRAMEWORK] (apps/web/)
-
-- Describir las principales areas de la UI
-- Rutas publicas vs protegidas
-- Integraciones externas
-
-### Backend: [TECHNOLOGY] (services/backend/)
-
-- Auth y gestion de usuarios
-- Principales entidades/collections
-- API endpoints o collections principales
 
 ## Data Flow
 
-1. **User** → Describir flujo principal
-2. **Admin** → Describir flujo de administracion
-3. **System** → Describir procesos automaticos
+```
+[Como viajan los datos por el sistema]
+```
 
-## Tech Stack
+## Endpoints Principales
 
-| Layer | Technology | Purpose |
-|-------|-----------|---------|
-| Frontend | [Framework] | [Purpose] |
-| Backend | [Technology] | [Purpose] |
-| Database | [DB] | [Purpose] |
-| Deployment | [Platform] | [Purpose] |
+| Method | Path | Auth | Descripcion |
+|--------|------|------|-------------|
+| GET | /api/health | no | Health check |
+| [method] | [path] | [yes/no] | [descripcion] |
 
-## Data Model
+## Dependencias Externas
 
-Ver `AGENTS.md` para el esquema de datos principal.
+| Servicio | Uso | Config |
+|----------|-----|--------|
+| [servicio] | [uso] | [variable de entorno] |
 
-## Agent Harness
+### MCP Servers
 
-The project ships **two complementary SDD (Specification-Driven Development) harnesses** that drive the same
-workflow — ANALYZE → SPEC → IMPLEMENT → REVIEW → DECIDE — against the same `docs/` specs and source folders:
+| MCP | Tipo | Cuánto usar |
+|-----|------|-------------|
+| **CodeGraph** | Local (`npx -y @astudioplus/codegraph-mcp`) | Explorar codebase, impacto de cambios, understanding arquitectura |
+| **Context7** | Remote (HTTPS) | Investigar APIs/librerias, ejemplos actualizados |
+| **Engram** | Local (binario nativo `engram mcp`) | Memoria persistente entre sesiones, recordar decisiones |
 
-| Harness | Location | Engine | Notes |
-|---------|----------|--------|-------|
-| opencode | `.opencode/` | opencode agents (Markdown) | Reference harness; 7 role agents under `.opencode/agents/` |
-| pi | `.pi/` | pi v0.82.1 + `pi-subagents` v0.42.1 | Custom TypeScript orchestrator extension |
+**Configuración:** `.opencode/opencode.jsonc` (sección `mcp`) y `.claude/settings.json`.
 
-### Pi SDD Harness (`.pi/`)
+**Por defecto habilitados (out-of-the-box):** los 3 MCPs vienen activos al clonar el harness. Cada MCP anade tokens al contexto del LLM; desactiva el que no necesites en `opencode.jsonc`.
 
-- **`settings.json`** — declares the project-scoped resources for pi (the `sdd-orchestrator` extension).
-- **`agents/`** — 7 custom subagents (pi-subagents Markdown format): `sdd-spec-writer`, `sdd-frontend-developer`,
-  `sdd-backend-developer`, `sdd-code-reviewer`, `sdd-gdpr-auditor`, `sdd-release-manager`, and `sdd-delegate`.
-  Tool allowlists are role-scoped (reviewer/auditor are read-only; spec-writer only edits `docs/features/` and `docs/CHANGELOG.md`).
-- **`extensions/sdd-orchestrator/`** — TypeScript extension enforcing the SDD phase order:
-  - Commands: `/analyze`, `/spec`, `/implement`, `/review`, `/decide`, `/sdd-status`.
-  - Flow state persisted in `.pi/sdd-state.json` (survives restarts).
-  - Gate: `/implement` is rejected unless the active spec is `approved`.
-  - Decide flow: `/decide approved` writes `approved` into the spec file AND the flow state, then moves to phase
-    `implement` (approving a spec means implement it now). `/decide done` is the terminal phase; `/decide
-    needs-iteration` returns to `implement`. The `sdd-spec-writer` task also leaves the spec Status `approved`
-    when complete, so the loop never deadlocks behind a draft spec.
-  - Soft order gates: phases warn when entered out of order but never block the manual flow.
-  - Delegation: uses the pi-subagents RPC bridge (`subagents:rpc:v1:*`) to spawn the `sdd-*` agents as detached child sessions.
-  - Parallel GDPR audit: `/review` launches `sdd-gdpr-auditor` alongside `sdd-code-reviewer` when the spec involves personal data.
-  - Rate cap: max 3 concurrent background subagents (`SDD_MAX_CONCURRENT_SUBAGENTS` env override).
-- **`agent-memory/`** — persistent role memory for memory-enabled agents (`spec-writer`, `code-reviewer`, `gdpr-auditor`); gitignored runtime data.
-- **`sdd-state.json`** — runtime flow state, gitignored, regenerated by the orchestrator.
+---
 
-**Trust**: pi loads `.pi/` project resources only after the project is trusted (`/trust` in interactive mode, or `pi --approve` for one run).
+## Decisiones Arquitectônicas
 
-> Both harnesses read the same `docs/` specs and source folders — specs and code remain the single source of truth.
+## Decisiones Arquitectonicas
+
+Ver `docs/architecture/` para ADRs (Architecture Decision Records).
+
+## Seguridad
+
+- Auth via [metodo]
+- Datos sensibles en [ubicacion]
+- Rate limiting en [endpoints]
+- CORS configurado para [origenes]
+
+---
+
+_Actualiza este documento cuando cambie la arquitectura._

@@ -1,0 +1,73 @@
+# Auto detect text files and perform LF normalization
+* text=auto eol=lf
+
+# Explicitly declare text files
+*.md text diff=markdown
+*.txt text
+*.csv text
+*.json text
+*.yaml text
+*.yml text
+*.toml text
+*.ini text
+*.cfg text
+*.conf text
+
+# Source code
+*.py text diff=python
+*.js text
+*.ts text
+*.jsx text
+*.tsx text
+*.html text
+*.css text
+*.scss text
+*.vue text
+*.svelte text
+*.astro text
+*.go text
+*.rs text
+*.java text
+*.rb text
+
+# Shell scripts
+*.sh text eol=lf
+*.bash text eol=lf
+*.zsh text eol=lf
+
+# Docker
+Dockerfile* text
+*.dockerignore text
+
+# Config files
+*.json text
+*.yaml text
+*.yml text
+*.toml text
+Makefile text eol=lf
+CLAUDE.md text
+AGENTS.md text
+CONTEXT.md text
+
+# Binary files (do not modify)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg text
+*.webp binary
+*.mp3 binary
+*.mp4 binary
+*.zip binary
+*.tar.gz binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+
+# Lock files (do not resolve conflicts)
+package-lock.json -merge
+pnpm-lock.yaml -merge
+yarn.lock -merge
+composer.lock -merge

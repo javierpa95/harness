@@ -1,0 +1,72 @@
+{
+  // Un solo fichero de config (antes había opencode.json + opencode.jsonc,
+  // duplicados byte a byte — con jsonc alcanza, admite comentarios).
+  "$schema": "https://opencode.ai/config.json",
+  "permission": {
+    "read": {
+      ".env*": "deny",
+      "node_modules/**/*": "deny",
+      "dist/**/*": "deny",
+      "**/pb_data/**/*": "deny",
+      "**/*.db": "deny"
+    },
+    "glob": {
+      "node_modules/*": "deny",
+      "dist/*": "deny",
+      "**/pb_data/*": "deny"
+    },
+    // Red de seguridad por defecto para cualquier agente que no declare su
+    // propio permiso `edit`. Los agentes SÍ lo declaran (ver .opencode/agents/*.md)
+    // y ese permiso por-agente manda sobre este: project-architect y
+    // harness-arquitect tienen `edit: allow` sin restricciones y pueden tocar
+    // (lo necesita en el Paso 4 del onboarding, aunque lo normal es que
+    // ./init.sh ya lo haya hecho antes de la primera sesión).
+    "edit": {
+      ".opencode/**/*": "deny",
+      ".env*": "deny",
+      "**/pb_data/**/*": "deny",
+      "**/*.db": "deny"
+    },
+    // Nivel de bash GLOBAL gestionado por `make mode` (bloque harness:).
+    // No editar a mano: se sobrescribe al cambiar de modo.
+    // AUTO  = todo permitido salvo suelo anti-desastres (rm -rf, force-push...)
+    // SEGURO = preguntar para cualquier comando
+    // harness:bash:start modo=seguro
+    "bash": {
+      "*": "ask"
+    }
+    // harness:bash:end
+  },
+  // ============================================================
+  // MCP Servers
+  // ============================================================
+  // Activos por defecto (out-of-the-box): el harness se comparte
+  // y quiere funcionar sin config manual.
+  //   - CodeGraph: se instala via npx -y (@astudioplus/codegraph-mcp)
+  //   - Context7:  remote publico, funciona sin API key (basico)
+  //   - Engram:    binario local nativo (`engram mcp`), DB en ~/.engram
+  "mcp": {
+    "codegraph": {
+      "type": "local",
+      "command": ["npx", "-y", "@astudioplus/codegraph-mcp"],
+      "enabled": true
+    },
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "enabled": true
+    },
+    "engram": {
+      "type": "local",
+      "command": ["engram", "mcp", "--tools=agent"],
+      "enabled": true
+    }
+  },
+  // Tools de MCP habilitadas por defecto (mismo criterio out-of-the-box).
+  "tools": {
+    "codegraph_*": true,
+    "context7_*": true,
+    "engram_*": true
+  },
+  "default_agent": "project-architect"
+}

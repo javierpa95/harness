@@ -1,52 +1,66 @@
-# Deployment Guide — [PROJECT_NAME]
+# Deployment Guide
 
-## Infrastructure
+**Proyecto:** [PROJECT_NAME]
+**Plataforma:** [Coolify/Vercel/Railway/Docker]
 
-- **Hosting**: [PLATFORM — Coolify, Vercel, Railway, AWS, etc.]
-- **Frontend**: [FRAMEWORK] — [SSG/SSR/SPA]
-- **Backend**: [TECHNOLOGY] — [Description]
+---
 
-## Environment Variables
+## Requisitos
 
-See `config/.env.example` for required variables.
+- [requisito 1]
+- [requisito 2]
 
-### Production
+## Variables de Entorno
 
-```env
-# Copy from config/.env.example and fill with production values
-# DATABASE_URL=
-# API_URL=
-# AUTH_SECRET=
-# NODE_ENV=production
+| Variable | Descripcion | Requerida | Default |
+|----------|-------------|-----------|---------|
+| [VAR] | [descripcion] | [yes/no] | [default] |
+
+Ver `config/.env.example` para la lista completa.
+
+## Pasos de Deploy
+
+### 1. Preparar
+
+```bash
+# [paso 1]
 ```
 
-## [PLATFORM] Setup
+### 2. Build
 
-### 1. Backend Service
+```bash
+# [paso 2]
+```
 
-- Image/Stack: [Details]
-- Port: [PORT]
-- Persistent storage: [Path]
-- Environment: [Variables]
+### 3. Deploy
 
-### 2. Frontend Service
+```bash
+# [paso 3]
+```
 
-- Build command: [e.g., `npm run build`]
-- Output: [e.g., `dist/` directory]
-- Port: [PORT]
-- Environment: [Variables]
+### 4. Verificar
 
-## Domain Configuration
+```bash
+# [paso 4]
+```
 
-- Main domain: `your-domain.com` → Frontend
-- API subdomain (optional): `api.your-domain.com` → Backend
+## Rollback
 
-## SSL
+```bash
+# [como hacer rollback]
+```
 
-- [Platform] handles SSL automatically via Let's Encrypt
-- Ensure domain DNS points to the correct IP
+## Monitoreo
 
-## Backup
+- Health check: `GET /api/health`
+- Logs: `docker compose logs -f`
 
-- Backend: Backup database/data directory regularly
-- Frontend: No backup needed (regenerable from repo)
+## Troubleshooting
+
+| Problema | Solucion |
+|----------|--------------------|
+| [problema] | [solucion] |
+
+---
+
+_Actualiza este documento cuando cambie el proceso de deploy._

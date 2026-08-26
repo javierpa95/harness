@@ -1,15 +1,55 @@
-# CHANGELOG
+# Changelog
 
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+Todos los cambios notables en este proyecto. Formato basado en [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
 ### Added
-- Project initialization from SDD Agent Harness template
-- Pi SDD harness (`.pi/`): pi-subagents v0.42.1 installed, 7 custom `sdd-*` agents, and the `sdd-orchestrator` extension enforcing the SDD workflow (ANALYZE → SPEC → IMPLEMENT → REVIEW → DECIDE) — complementary to the opencode harness (`.opencode/`)
-- Onboarding manual (`docs/onboarding/`): index + chapters 01 (concepts), 02 (SDD flow), 03 (harness in practice) — level-zero progressive disclosure book that grows with the project
-- Onboarding advanced chapters: 05 (creating/editing agents), 06 (MCP servers + config merge), 07 (harness maintenance/testing, escape hatches)
-- `make setup` harness configurator: interactive full-screen TUI (arrow keys, Enter to assign, Q/ESC to quit) that pre-loads existing picks; `make setup-file` applies a central `harness.settings.jsonc` non-interactively; detects the user's installed providers via `opencode models`; chapter 04 of onboarding documents it
-- Design agent (`.opencode/agents/design.md`, mode: all) for UX/UI inspiration, opinion, and `docs/design.md`; `design-inspiration` skill with curated reference sites; `make setup` now manages `model` AND `mode` per agent (M key cycles primary/subagent/all)
+- `harness-arquitect` primary agent (OpenCode-only): meta-agent that configures and evolves the harness itself; full edit/bash permissions with `.env*` still denied
+- `docs/harness/opencode-docs.md`: verified knowledge base of official OpenCode docs (permissions first), maintained by harness-arquitect
+- MCP integration: codegraph, context7, engram servers pre-configured and enabled in `.opencode/opencode.jsonc` and `.claude/settings.json`
+- `docs/harness/` educational doc directory with: MCP-integration.md, agents-patterns.md, sdd-advanced.md
+- Agent tool patterns: CodeGraph, Context7, Engram integration with SDD flow
+- `harness-guide` skill: on-demand onboarding guide for new users (agents, commands, memory, permissions, make tricks)
+- Harness CLI: `.opencode/scripts/harness.mjs` (zero-dep Node) with `models`, `model <agent> <provider/model|inherit>`, `skills`, `backlog [project|harness]`, and an interactive TUI menu (`make tui`, v0)
+- Make targets: `make models`, `make model AGENT=x MODEL=y|inherit`, `make tui`
+- `docs/harness/BACKLOG.md`: evolution backlog for the harness (TUI ideas first)
+- **Project backlog** `docs/BACKLOG.md`: where every not-now idea/debt goes; wired into AGENTS.md workflow rules, `/start` session ritual and the TUI backlog view (press `b` to toggle project/harness source)
+- OpenCode setup detection in `models` command and TUI "Proveedores" view: global+project config merge, authenticated providers from `auth.json` (names only), declared model IDs per provider, json-level agent overrides
+- **Health audit**: new `make doctor` command and TUI "Auditoria" view (expandable per-agent findings) checking memory writability vs edit rules, traitor flat `read: 'allow'`, model id format, default_agent validity and deprecated config; includes a glob matcher faithful to OpenCode wildcard semantics (`*` crosses `/`, `**/` = zero or more segments)
+- Dashboard quick wins: `r` redraws from anywhere, agent count summary line
+- **Visual overhaul of the dashboard**: fixed-height frame (no more jumping between views), ANSI-aware width clamping so borders never break, flicker-free redraw (cursor-home + clear-to-EOL instead of full clear), hidden cursor during render, alternate screen buffer (terminal restored on exit), compact tab bar that fits six views, visible cursor only during text prompts
+- **Permission modes**: `make mode MODE=auto|seguro` (and dashboard key `m`, badge in header) switches the global bash level via a comment-managed block in `opencode.jsonc` that preserves the rest of the file byte-for-byte. AUTO allows everything except a disaster floor (rm -rf / sudo / force-push / reset --hard still ask); SEGURO asks for every command. Developers/spec-writer no longer declare bash so they inherit the global switch; auditors keep their own restrictive allow-lists and never prompt in either mode. `.env*`, pb_data, local DBs and edit whitelists are mode-invariant. See `docs/harness/MODES.md`.
+- **Granular permissions UI**: the TUI Auditoria view became "Permisos" — global mode keys (`A`=AUTO, `S`=SEGURO), per-agent bash cycling with `b` (inherit → allow → ask) writing/removing the frontmatter declaration with write-then-reparse verification, whitelist-managed agents protected from accidental edits, and an expandable detail showing every declared permission rule plus health findings. CLI parity: `harness.mjs bash <agent> <inherit|allow|ask>`.
+- Interactive dashboard v1: arrow-key navigation, 5 views (Agents & Models with inline model change/inherit, Skills, dual-source Backlog, Providers, Help), git status header; raw keypress rendering with zero dependencies
+- **`make update`**: syncs harness-owned files from a template checkout into existing projects with 4-way classification (install/update/current/conflict via `.opencode/harness-sync.json` manifest), rename-aware architect mapping (reads `default_agent`), conflicts written as `<file>.new` for manual review. Agents deleted by init are respected and never resurrected (`RESTORE=1` opts in). Project-owned files are never touched. `make update-dry` previews. See `docs/harness/UPDATE.md`.
+- `fix(harness)`: dashboard crash on launch (`emitKeypressEvents` imported from the wrong readline module); `i` shortcut wired in agents view
+
+### Fixed
+- MCP servers: fix npm 404 packages. CodeGraph now uses `@astudioplus/codegraph-mcp`; Engram uses the native local binary `engram mcp --tools=agent` (no longer the nonexistent `@gentlest-mcp/*`). All three MCPs (codegraph, context7, engram) now active by default for an out-of-the-box harness in both `.opencode/opencode.jsonc` and `.claude/settings.json`.
+- Permission rule ordering in all granular agents: catch-all (`'*'`) now comes FIRST, specific rules AFTER ("last matching rule wins" per official docs); previous ordering silently denied whitelisted commands
+- **CRITICAL**: `init.sh` never updated `default_agent` when renaming project-architect, so clones created on Linux/macOS silently fell back to the built-in `build` agent; init.sh now mirrors init.ps1 behavior
+- Agent permissions audit: code-reviewer/gdpr-auditor/docs-auditor/backend-developer can now write their own `agent-memory/` notes; bash whitelists use exact+wildcard pairs (patterns without `*` only match bare commands); removed flat `read: 'allow'` that bypassed the global `.env*` read deny; project-architect re-denies `.env*` edits
+- Removed dead/deprecated agent config: `tools: {'*': true}` blocks (deprecated since v1.1.1) and unrecognized `plan_enter`/`plan_exit` permission keys
+- handoff skill: removed ignored `invocation` frontmatter field; `/start` and `/end` gained description frontmatter; `/end` no longer assumes bash-only heredoc syntax
+
+### Changed
+- spec-writer no longer edits `docs/CHANGELOG.md` (changelog belongs to developers/docs-maintainer)
+- Removed unused `@opencode-ai/plugin` dependency from `.opencode/` (no plugins exist); `.opencode/.gitignore` is now tracked (was self-ignored) so clones get ignore rules
+- Makefile: removed duplicated legacy CI target block that overrode the updated one
+- Docs synced: AGENTS.md skills/routing tables, CREATING_AGENTS.md (correct global agents path `~/.config/opencode/agent(s)/`, modern template without deprecated fields, bash wildcard rule), opencode-docs.md (agents/skills/schema verified 2026-08-25)
+
+---
+
+## [0.1.0] - [DATE]
+
+### Added
+- Proyecto inicial con harness de agentes SDD
+- Agentes: architect, spec-writer, frontend-developer, backend-developer, code-reviewer, gdpr-auditor, release-manager, docs-auditor
+- Hooks de seguridad en Claude Code
+- Memoria agnostica compartida
+- Makefile con comandos de agentes
+
+---
+
+_Registra cada release significativo. Manten la seccion [Unreleased] actualizada._

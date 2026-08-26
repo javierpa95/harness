@@ -1,0 +1,188 @@
+# Coding Standards
+
+**Proyecto:** [PROJECT_NAME]
+**Stack:** [STACK_TECH]
+**Ultima actualizacion:** [DATE]
+
+---
+
+## General Principles
+
+1. **Claridad sobre cleverness** — Código que otros entienden > código inteligente
+2. **Menos es mejor** — Menos líneas, menos dependencias, menos complejidad
+3. **Consistencia** — Sigue el patrón existente en el proyecto
+4. **No repitas** — Si lo escribes dos veces, extrae una función
+5. **Testea** — Si se puede testear, testea
+
+---
+
+## Naming Conventions
+
+### Variables y Functions
+```typescript
+// ✅ Bien
+const userName = "John"
+const isLoading = false
+function getUserById(id: string) { }
+
+// ❌ Mal
+const u = "John"
+const loading = false
+function get(id) { }
+```
+
+### Classes y Types
+```typescript
+// ✅ Bien
+class UserService { }
+interface UserProfile { }
+type Status = "active" | "inactive"
+
+// ❌ Mal
+class user_service { }
+interface userProfile { }
+```
+
+### Constants
+```typescript
+// ✅ Bien
+const MAX_RETRIES = 3
+const API_BASE_URL = "https://api.example.com"
+
+// ❌ Mal
+const maxRetries = 3
+const apiBaseUrl = "https://api.example.com"
+```
+
+### Files
+```
+✅ user-service.ts (kebab-case)
+✅ user-profile.tsx
+❌ UserService.ts
+❌ userProfile.tsx
+❌ user_service.ts
+```
+
+---
+
+## Code Structure
+
+### Imports
+```typescript
+// 1. External libraries
+import React from "react"
+import { useState } from "react"
+
+// 2. Internal modules (absolute)
+import { UserService } from "@/services/user"
+import { Button } from "@/components/Button"
+
+// 3. Relative imports
+import "./styles.css"
+```
+
+### Functions
+- Máximo **30 líneas** por función
+- Un soloResponsabilidad
+- Parámetros con tipos
+- Return explícito
+
+### Components (React/Vue/Svelte)
+```typescript
+// ✅ Bien — Componente limpio
+interface ButtonProps {
+  label: string
+  onClick: () => void
+  variant?: "primary" | "secondary"
+}
+
+export function Button({ label, onClick, variant = "primary" }: ButtonProps) {
+  return (
+    <button className={`btn btn-${variant}`} onClick={onClick}>
+      {label}
+    </button>
+  )
+}
+```
+
+---
+
+## Error Handling
+
+```typescript
+// ✅ Bien — Error específico
+try {
+  const user = await getUser(id)
+} catch (error) {
+  if (error instanceof NotFoundError) {
+    console.error("User not found:", id)
+  } else {
+    throw error // Re-lanzar errores no manejados
+  }
+}
+
+// ❌ Mal — Catch genérico
+try {
+  const user = await getUser(id)
+} catch (error) {
+  console.log(error) // ¿Qué error? ¿Qué hacer?
+}
+```
+
+---
+
+## Testing
+
+### Convenciones
+- Tests en `__tests__/` o junto al archivo como `*.test.ts`
+- Un test por comportamiento
+- Describe blocks para agrupar
+- Naming: `should [expected behavior] when [condition]`
+
+```typescript
+describe("UserService", () => {
+  describe("getUser", () => {
+    it("should return user when id is valid", () => { })
+    it("should throw NotFoundError when id is invalid", () => { })
+    it("should throw ValidationError when id is empty", () => { })
+  })
+})
+```
+
+---
+
+## Git
+
+### Commits
+```
+type(scope): description
+
+feat(auth): add JWT authentication
+fix(api): handle null response
+docs: update README
+refactor(utils): extract helper function
+```
+
+### Branches
+```
+main ← siempre estable
+├── feature/user-auth
+├── fix/null-response
+└── release/v1.0.0
+```
+
+---
+
+## Prohibiciones
+
+1. **NUNCA** hardcodees credenciales
+2. **NUNCA** uses `any` sin justificación
+3. **NUNCA** hagas `console.log` en producción
+4. **NUNCA** omitas tipos en TypeScript
+5. **NUNCA** ignores errores con `catch {}`
+6. **NUNCA** copies código — extrae función
+7. **NUNCA** commitees sin tests para lógica de negocio
+
+---
+
+_Actualiza este documento cuando descubras nuevas convenciones._

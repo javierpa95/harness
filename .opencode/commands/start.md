@@ -1,3 +1,7 @@
+---
+description: Carga el contexto completo del proyecto al inicio de sesion (git, memoria, salud). Solo lectura.
+---
+
 # /start — Ritual de Inicio de Sesion
 
 ## Descripcion
@@ -22,6 +26,7 @@ Leer estos archivos:
 - `docs/development/session-log.md` (ultimas 3 entradas)
 - `docs/development/agent_memory.md` (ultimos 2 hallazgos)
 - `docs/architecture/system_overview.md` (mapa arquitectonico)
+- `docs/BACKLOG.md` (top 3 pendientes del proyecto — candidatas para esta sesion)
 
 ### 3. Estado de salud rapido
 

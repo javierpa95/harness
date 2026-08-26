@@ -182,7 +182,7 @@ Read this file and execute the following steps:
    - Update the Project Clarification examples if needed
 
 3. **Update opencode config:**
-   - Set default_agent to $ArchitectName in both opencode.json and opencode.jsonc
+- Set default_agent to $ArchitectName in .opencode/opencode.jsonc
 
 4. **Configure agents for this stack:**
    - If Frontend is "None": delete frontend-developer.md
@@ -219,7 +219,7 @@ if (Test-Path $OldArchitect) {
     Write-Ok "  Renamed project-architect.md to $ArchitectName.md"
 }
 
-# -- Update opencode.json default_agent --
+# -- Update default_agent in opencode.jsonc --
 $Files = @(".opencode/opencode.json", ".opencode/opencode.jsonc")
 foreach ($File in $Files) {
     if (Test-Path $File) {
@@ -229,7 +229,7 @@ foreach ($File in $Files) {
         Set-Content -LiteralPath $File -Value $Content -Encoding UTF8 -NoNewline
     }
 }
-Write-Ok "  Updated default_agent in opencode.json/jsonc"
+Write-Ok "  Updated default_agent in .opencode/opencode.jsonc"
 
 Write-Host ""
 Write-Prompt "================================="

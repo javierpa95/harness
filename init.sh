@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # init.sh — SDD Agent Harness Project Setup
 # Interactive script to configure a new project from the template.
-# Generates prompt.md for the agent to finish configuration.
+# Configures BOTH OpenCode and Claude Code.
 
 set -e
 
@@ -140,14 +140,169 @@ case "$DEP_NUM" in
   *) DEPLOY="Docker" ;;
 esac
 
-# ── Generate prompt.md ──
+# ── Design System ──
 echo ""
-echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${GREEN}✅ Generating prompt.md...${NC}"
+echo -e "${GREEN}🎨 Design System${NC}"
 
+if [ "$FRONTEND" != "None" ]; then
+  echo -e "  ${YELLOW}Do you want a DESIGN.md (visual design tokens)?${NC}"
+  echo "    1) Yes — use a reference design system"
+  echo "    2) Yes — start from scratch"
+  echo "    3) No — skip (add later)"
+  read -rp "  Select [1-3] (default: 1): " DS_NUM
+  case "$DS_NUM" in
+    1) DESIGN_SYSTEM="reference" ;;
+    2) DESIGN_SYSTEM="scratch" ;;
+    3) DESIGN_SYSTEM="skip" ;;
+    *) DESIGN_SYSTEM="reference" ;;
+  esac
+
+  if [ "$DESIGN_SYSTEM" = "reference" ]; then
+    echo ""
+    echo -e "  ${YELLOW}Choose a reference design system:${NC}"
+    echo "    1)  Material (Google)"
+    echo "    2)  Apple (iOS)"
+    echo "    3)  Ant Design"
+    echo "    4)  Shadcn"
+    echo "    5)  Tailwind"
+    echo "    6)  Vercel"
+    echo "    7)  Linear"
+    echo "    8)  Notion"
+    echo "    9)  Spotify"
+    echo "    10) Custom (you'll define later)"
+    read -rp "  Select [1-10] (default: 1): " REF_NUM
+    case "$REF_NUM" in
+      1) REFERENCE_DESIGN="material" ;;
+      2) REFERENCE_DESIGN="apple" ;;
+      3) REFERENCE_DESIGN="ant" ;;
+      4) REFERENCE_DESIGN="shadcn" ;;
+      5) REFERENCE_DESIGN="tailwind" ;;
+      6) REFERENCE_DESIGN="vercel" ;;
+      7) REFERENCE_DESIGN="linear" ;;
+      8) REFERENCE_DESIGN="notion" ;;
+      9) REFERENCE_DESIGN="spotify" ;;
+      10) REFERENCE_DESIGN="custom" ;;
+      *) REFERENCE_DESIGN="material" ;;
+    esac
+  fi
+else
+  DESIGN_SYSTEM="skip"
+  REFERENCE_DESIGN="none"
+fi
+
+echo ""
+echo -e "${GREEN}📐 Coding Standards${NC}"
+echo -e "  ${YELLOW}Include CODING_STANDARDS.md?${NC}"
+echo "    1) Yes — full standards"
+echo "    2) Minimal — just naming conventions"
+echo "    3) No — use AGENTS.md only"
+read -rp "  Select [1-3] (default: 1): " CS_NUM
+case "$CS_NUM" in
+  1) CODING_STANDARDS="full" ;;
+  2) CODING_STANDARDS="minimal" ;;
+  3) CODING_STANDARDS="skip" ;;
+  *) CODING_STANDARDS="full" ;;
+esac
+
+# ── Generate variables ──
 ARCHITECT_NAME="${PROJECT_NAME}-architect"
 STACK_SUMMARY="${FRONTEND} + ${BACKEND} + ${DATABASE}"
+DATE=$(date +%Y-%m-%d)
 
+echo ""
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${GREEN}⚙️  Configuring project...${NC}"
+
+# ── 1. Install npm dependencies (husky + commitlint) ──
+echo -e "  ${YELLOW}→ Installing npm dependencies (husky, commitlint)...${NC}"
+if command -v npm &> /dev/null; then
+  npm install 2>/dev/null && echo -e "  ${GREEN}✓ npm install complete${NC}" || echo -e "  ${YELLOW}⚠ npm install skipped (run manually later)${NC}"
+else
+  echo -e "  ${YELLOW}⚠ npm not found. Run 'npm install' manually after setup.${NC}"
+fi
+
+# ── 2. Setup git hooks ──
+echo -e "  ${YELLOW}→ Setting up git hooks...${NC}"
+if [ -d ".git" ] && command -v npx &> /dev/null; then
+  npx husky 2>/dev/null && echo -e "  ${GREEN}✓ Git hooks installed${NC}" || echo -e "  ${YELLOW}⚠ Husky setup skipped${NC}"
+else
+  echo -e "  ${YELLOW}⚠ No git repo or npx. Run 'npx husky' manually after setup.${NC}"
+fi
+
+# ── 3. Update AGENTS.md ──
+echo -e "  ${YELLOW}→ Updating AGENTS.md...${NC}"
+if [ -f "AGENTS.md" ]; then
+  sed -i "s/\[PROJECT_NAME\]/${PROJECT_NAME}/g" AGENTS.md
+  sed -i "s/\[ONE_LINE_DESCRIPTION\]/${PROJECT_DESC}/g" AGENTS.md
+  sed -i "s/\[STACK_TECH\]/${STACK_SUMMARY}/g" AGENTS.md
+  sed -i "s/\[DATE\]/${DATE}/g" AGENTS.md
+  echo -e "  ${GREEN}✓ AGENTS.md configured${NC}"
+fi
+
+# ── 4. Update CLAUDE.md ──
+echo -e "  ${YELLOW}→ Updating CLAUDE.md...${NC}"
+if [ -f "CLAUDE.md" ]; then
+  sed -i "s/\[PROJECT_NAME\]/${PROJECT_NAME}/g" CLAUDE.md
+  sed -i "s/\[ONE_LINE_DESCRIPTION\]/${PROJECT_DESC}/g" CLAUDE.md
+  sed -i "s/\[STACK_TECH\]/${STACK_SUMMARY}/g" CLAUDE.md
+  echo -e "  ${GREEN}✓ CLAUDE.md configured${NC}"
+fi
+
+# ── 5. Rename architect files ──
+echo -e "  ${YELLOW}→ Renaming architect agents...${NC}"
+
+# OpenCode
+if [ -f ".opencode/agents/project-architect.md" ]; then
+  mv ".opencode/agents/project-architect.md" ".opencode/agents/${ARCHITECT_NAME}.md"
+  sed -i "s/^name: project-architect/name: ${ARCHITECT_NAME}/" ".opencode/agents/${ARCHITECT_NAME}.md" 2>/dev/null || true
+  echo -e "  ${GREEN}V OpenCode: project-architect.md  ${ARCHITECT_NAME}.md${NC}"
+fi
+
+# Update default_agent in opencode config.
+# Without this, OpenCode silently falls back to the built-in 'build' agent.
+if [ -f ".opencode/opencode.jsonc" ]; then
+  sed -i "s/\"default_agent\": \"project-architect\"/\"default_agent\": \"${ARCHITECT_NAME}\"/" ".opencode/opencode.jsonc"
+  echo -e "  ${GREEN}V OpenCode: default_agent -> ${ARCHITECT_NAME}${NC}"
+fi
+
+# Claude Code — architect is in CLAUDE.md, not a separate file
+# Just update the architect name reference in CLAUDE.md
+if [ -f "CLAUDE.md" ]; then
+  sed -i "s/Project Architect/${ARCHITECT_NAME}/g" CLAUDE.md 2>/dev/null || true
+  echo -e "  ${GREEN}✓ Claude Code: architect name updated in CLAUDE.md${NC}"
+fi
+
+# ── 6. Configure agents for stack ──
+echo -e "  ${YELLOW}→ Configuring agents for stack...${NC}"
+
+if [ "$FRONTEND" = "None" ]; then
+  rm -f ".opencode/agents/frontend-developer.md" ".claude/agents/frontend-developer.md" 2>/dev/null
+  echo -e "  ${GREEN}✓ Removed frontend-developer (no frontend)${NC}"
+fi
+
+if [ "$BACKEND" = "None" ]; then
+  rm -f ".opencode/agents/backend-developer.md" ".claude/agents/backend-developer.md" 2>/dev/null
+  echo -e "  ${GREEN}✓ Removed backend-developer (no backend)${NC}"
+fi
+
+# ── 7. Update README.md ──
+echo -e "  ${YELLOW}→ Updating README.md...${NC}"
+if [ -f "README.md" ]; then
+  sed -i "s/\[PROJECT_NAME\]/${PROJECT_NAME}/g" README.md
+  sed -i "s/\[ONE_LINE_DESCRIPTION\]/${PROJECT_DESC}/g" README.md
+  sed -i "s/\[STACK_TECH\]/${STACK_SUMMARY}/g" README.md
+  echo -e "  ${GREEN}✓ README.md configured${NC}"
+fi
+
+# ── 8. Update Makefile ──
+echo -e "  ${YELLOW}→ Updating Makefile...${NC}"
+if [ -f "Makefile" ]; then
+  sed -i "s/\[PROJECT_NAME\]/${PROJECT_NAME}/g" Makefile
+  echo -e "  ${GREEN}✓ Makefile configured${NC}"
+fi
+
+# ── 9. Generate prompt.md for agent ──
+echo -e "  ${YELLOW}→ Generating prompt.md for agent...${NC}"
 cat > prompt.md << EOF
 # Project Configuration — Generated by init.sh
 
@@ -156,6 +311,7 @@ cat > prompt.md << EOF
 - **Description:** ${PROJECT_DESC}
 - **Type:** ${PROJECT_TYPE}
 - **UI Language:** ${UI_LANG}
+- **Date:** ${DATE}
 
 ## Stack
 - **Frontend:** ${FRONTEND}
@@ -173,63 +329,73 @@ cat > prompt.md << EOF
 
 Read this file and execute the following steps:
 
-1. **Rename agent files:**
-   - Rename \`.opencode/agents/project-architect.md\` to \`.opencode/agents/${ARCHITECT_NAME}.md\`
-   - Update the frontmatter \`name:\` field in the renamed file
+1. **Update architect name in agent files:**
+   - Update references to "project-architect" in AGENTS.md and CLAUDE.md
+   - Update the routing table in both files
 
-2. **Update AGENTS.md:**
-   - Fill header placeholders: PROJECT_NAME, ONE_LINE_DESCRIPTION, STACK_TECH, DATE
-   - Update the architect name in the Agent Harness table
-   - Update the Project Clarification examples if needed
-
-3. **Update opencode config:**
-   - Set \`default_agent\` to \`${ARCHITECT_NAME}\` in both \`opencode.json\` and \`opencode.jsonc\`
-
-4. **Configure agents for this stack:**
-   - If Frontend is "None": delete \`frontend-developer.md\`
-   - If Backend is "None": delete \`backend-developer.md\`
-   - Keep \`spec-writer.md\` and \`code-reviewer.md\` (always needed)
-   - Keep \`gdpr-auditor.md\` if handling user data
-   - Keep \`release-manager.md\`
-
-5. **Update README.md:**
-   - Set project name, description, and stack
-   - Update Quick Start commands for the chosen stack
-
-6. **Decide folder structure:**
-   - Based on project type and stack, propose the appropriate structure
-   - Create necessary directories (apps/web, services/backend, etc.)
+2. **Decide folder structure:**
+   - Based on project type and stack, create the appropriate directories
    - Remove unnecessary ones
 
-7. **Delete this file** (\`prompt.md\`) when configuration is complete.
+3. **Update docs templates:**
+   - Fill placeholders in docs/architecture/system_overview.md
+   - Fill placeholders in docs/architecture/deployment.md
+   - Update docs/legal/privacy_policy.md
 
-After completing these steps, confirm to the user that the project is ready and run \`/start\` to begin development.
+4. **Delete this file** (\`prompt.md\`) when configuration is complete.
+
+After completing these steps, confirm to the user that the project is ready.
 EOF
 
-# ── Rename architect file ──
-if [ -f ".opencode/agents/project-architect.md" ]; then
-  mv ".opencode/agents/project-architect.md" ".opencode/agents/${ARCHITECT_NAME}.md"
-  # Update frontmatter name field
-  if command -v sed &> /dev/null; then
-    sed -i '' "s/^name: project-architect/name: ${ARCHITECT_NAME}/" ".opencode/agents/${ARCHITECT_NAME}.md" 2>/dev/null || \
-    sed -i "s/^name: project-architect/name: ${ARCHITECT_NAME}/" ".opencode/agents/${ARCHITECT_NAME}.md"
-  fi
-  echo -e "${GREEN}  ✓ Renamed project-architect.md → ${ARCHITECT_NAME}.md${NC}"
+echo -e "  ${GREEN}✓ prompt.md generated${NC}"
+
+# ── 10. Copy DESIGN.md template ──
+if [ "$DESIGN_SYSTEM" != "skip" ] && [ -f "DESIGN.md.template" ]; then
+  cp "DESIGN.md.template" "DESIGN.md"
+  sed -i "s/\[PROJECT_NAME\]/${PROJECT_NAME}/g" DESIGN.md
+  sed -i "s/\[DESCRIBE THE VISUAL IDENTITY.*/${REFERENCE_DESIGN} design system reference/g" DESIGN.md
+  echo -e "  ${GREEN}✓ DESIGN.md created (reference: ${REFERENCE_DESIGN})${NC}"
+  echo -e "  ${YELLOW}  → Edit DESIGN.md to match your brand${NC}"
 fi
 
-# ── Update opencode.json default_agent ──
-if command -v sed &> /dev/null; then
-  sed -i '' "s/\"default_agent\": \"project-architect\"/\"default_agent\": \"${ARCHITECT_NAME}\"/" .opencode/opencode.json 2>/dev/null || \
-  sed -i "s/\"default_agent\": \"project-architect\"/\"default_agent\": \"${ARCHITECT_NAME}\"/" .opencode/opencode.json
-  sed -i '' "s/\"default_agent\": \"project-architect\"/\"default_agent\": \"${ARCHITECT_NAME}\"/" .opencode/opencode.jsonc 2>/dev/null || \
-  sed -i "s/\"default_agent\": \"project-architect\"/\"default_agent\": \"${ARCHITECT_NAME}\"/" .opencode/opencode.jsonc
+# ── 11. Copy CODING_STANDARDS.md template ──
+if [ "$CODING_STANDARDS" != "skip" ] && [ -f "CODING_STANDARDS.md.template" ]; then
+  cp "CODING_STANDARDS.md.template" "CODING_STANDARDS.md"
+  sed -i "s/\[PROJECT_NAME\]/${PROJECT_NAME}/g" CODING_STANDARDS.md
+  sed -i "s/\[STACK_TECH\]/${STACK_SUMMARY}/g" CODING_STANDARDS.md
+  sed -i "s/\[DATE\]/${DATE}/g" CODING_STANDARDS.md
+  echo -e "  ${GREEN}✓ CODING_STANDARDS.md created (${CODING_STANDARDS})${NC}"
 fi
-echo -e "${GREEN}  ✓ Updated default_agent in opencode.json/jsonc${NC}"
 
+# ── 12. Update .gitignore for templates ──
+echo "" >> .gitignore
+echo "# Templates (not tracked)" >> .gitignore
+echo "*.template" >> .gitignore
+
+# ── Summary ──
 echo ""
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${GREEN}✅ Setup complete!${NC}"
 echo ""
-echo -e "  ${YELLOW}Next step:${NC} Open the project in opencode."
-echo -e "  The agent will read ${CYAN}prompt.md${NC} and finish configuration."
+echo -e "  ${YELLOW}What was configured:${NC}"
+echo "    ✓ npm dependencies (husky, commitlint)"
+echo "    ✓ Git hooks (pre-commit, commit-msg)"
+echo "    ✓ AGENTS.md (placeholders filled)"
+echo "    ✓ CLAUDE.md (placeholders filled)"
+echo "    ✓ Architect agents renamed"
+echo "    ✓ Stack-specific agents configured"
+echo "    ✓ README.md (placeholders filled)"
+echo "    ✓ Makefile (project name)"
+echo "    ✓ prompt.md (for agent to finish setup)"
+if [ "$DESIGN_SYSTEM" != "skip" ]; then
+  echo "    ✓ DESIGN.md (visual tokens: ${REFERENCE_DESIGN})"
+fi
+if [ "$CODING_STANDARDS" != "skip" ]; then
+  echo "    ✓ CODING_STANDARDS.md (${CODING_STANDARDS})"
+fi
+echo ""
+echo -e "  ${YELLOW}Next steps:${NC}"
+echo "    1. Open in OpenCode or Claude Code"
+echo "    2. The agent will read prompt.md and finish configuration"
+echo "    3. Run 'make help' to see available commands"
 echo ""

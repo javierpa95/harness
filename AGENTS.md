@@ -358,6 +358,7 @@ El proyecto usa un harness de agentes de IA para coordinar el desarrollo mediant
 | `make models` | Lista agentes y su modelo configurado |
 | `make model AGENT=x MODEL=y` | Cambia el modelo de un agente (`MODEL=inherit` para heredar) |
 | `make tui` | Menu interactivo del harness (v0) |
+| `make mode MODE=auto\|seguro` | Modo de permisos bash: autonomo con suelo anti-desastres vs supervisado (ver `docs/harness/MODES.md`) |
 | `make update TEMPLATE=<ruta>` | Sincroniza ficheros del harness desde el template (ver `docs/harness/UPDATE.md`) |
 | `.opencode/scripts/harness.mjs` | CLI subyacente (`models`, `model`, `skills`, `tui`) |
 
@@ -369,6 +370,7 @@ El proyecto usa un harness de agentes de IA para coordinar el desarrollo mediant
 | "Tengo una idea" / "Que te parece esto" | `project-architect` (modo grilling) |
 | "Configura/adapta el harness" o dudas de OpenCode/permisos | `harness-arquitect` |
 | "Actualiza el harness de este proyecto" | `make update TEMPLATE=<ruta>` (docs/harness/UPDATE.md) |
+| "Quiero que trabaje solo / sin preguntar" | `make mode MODE=auto` (docs/harness/MODES.md) |
 | "Como uso el harness? / Que puedo hacer?" | Skill `harness-guide` (cualquier agente) |
 | "Revisa este codigo" | `code-reviewer` |
 | "Que falta para el release?" | `release-manager` |

@@ -71,7 +71,7 @@ Prioridad propuesta: 🔥 alto | 🧊 medio | ❄️ algún día
 
 - [ ] 🧊 Fuente remota: `make update TEMPLATE=https://github.com/user/repo` (shallow clone a temp)
 - [ ] 🧊 Merge guiado de conflictos dentro del TUI (diff lado a lado en consola)
-- [ ] ❄️ Bloques gestionados para Makefile/opencode.jsonc (marcadores # harness:start/end)
+- [x] ~~Bloques gestionados para opencode.jsonc~~ — primer caso resuelto: bloque `harness:bash` gestionado por `make mode` (preserva comentarios y resto del fichero); Makefile con marcadores sigue pendiente (2026-08-25)
 - [ ] ❄️ Deduplicar stripJsonc entre harness.mjs y harness-update.mjs en lib compartida
 
 ---

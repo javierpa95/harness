@@ -40,6 +40,10 @@ Memoria persistente del meta-agente. Leer ANTES de trabajar; actualizar AL TERMI
 
 ## Gotchas
 
+- **Anclar entradas nuevas en este MEMORY.md**: usar como oldString el bloque '---\n\n## Gotchas' o similar, NUNCA solo la ultima entrada (2 veces se reemplazo en vez de anadir).
+- **PowerShell + node -e con comillas anidadas**: sigue roto incluso con escapado cuidadoso → SIEMPRE archivo temporal.
+- **El usuario prueba las cosas entre sesiones**: estado local puede divergir de HEAD por teclas del TUI (ej. modo=auto tras pulsar m/A). Verificar git status/diff ANTES de asumir bug propio: comparar HEAD vs working tree primero.
+
 - **PowerShell + `node -e`**: el escapado de comillas rompe scripts inline complejos. Escribir el script a archivo temporal (`C:\Users\javie\AppData\Local\Temp\opencode\`) y ejecutarlo por path.
 - **Validar JSONC**: `JSON.parse` directo falla por comentarios; el stripper DEBE respetar strings o se come el `//` de `https://`. Validator en `%TEMP%\opencode\validate-jsonc.js` (tecnica: flag inStr/inEsc).
 - **`git grep --cached`** en esta version exige `--cached` antes de los argumentos no-opcion; alternativa robusta: `git diff --cached | Select-String`.

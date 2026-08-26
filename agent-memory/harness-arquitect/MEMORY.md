@@ -30,6 +30,14 @@ Memoria persistente del meta-agente. Leer ANTES de trabajar; actualizar AL TERMI
 - **2026-08-25 (TUI visual)** — Desajuste del marco tenia 3 causas: linea desnuda sin bordes (un '' fuera de boxLine), tabs que desbordaban W, y boxLine con off-by-one (faltaba espacio antes del borde derecho: borders(2)+space+c+space=W). Reglas TUI que funcionan: cuerpo de ALTURA FIJA, redraw con \x1b[H + \x1b[K por linea (no 2J), cursor oculto salvo prompts (\x1b[?25l/h), alt-screen \x1b[?1049h/l para restaurar terminal al salir, y clamp ANSI-aware que degrada a texto plano. Tecnica de test sin TTY: extraer funciones puras del fuente via regex + new Function(scope) y asertar longitudes con contenido envenenado (status de 200 chars).
 - **GOTCHA DE MEMORIA**: al anadir entradas nuevas a este fichero con Edit, NO usar como oldString la ultima entrada (se reemplaza en vez de anadir). Usar el separador '---' previo a _Ultima actualizacion_ como ancla, o oldString que incluya AMBAS (entrada vieja + entrada nueva concatenada). Ha pasado 2 veces hoy.
 
+## Hallazgos de sesion 2026-08-25 (modos de permisos)
+
+- Modelo elegido: herencia invertida — developers SIN bash propio (heredan global del bloque gestionado), auditores CON whitelist propia (nunca preguntan). Un interruptor (`make mode MODE=auto|seguro`, tecla m en TUI) gobierna a los herederos. Doc: docs/harness/MODES.md.
+- Bloque gestionado `// harness:bash:start modo=X` / `:end` en opencode.jsonc: reescritura quirurgica preservando el resto byte a byte. Presets SIN coma final (bash es ultima propiedad de permission).
+- JSON.parse ESTRICTO rechaza comas colgantes, pero el schema de OpenCode las permite (allowTrailingCommas) → validar siempre con stripJsonc().replace(/,\s*([}\]])/g,'$1') o marcara invalidas configs legitimas. Costo: un ciclo E2E de depuracion con char-at sobre la posicion del error.
+
+---
+
 ## Gotchas
 
 - **PowerShell + `node -e`**: el escapado de comillas rompe scripts inline complejos. Escribir el script a archivo temporal (`C:\Users\javie\AppData\Local\Temp\opencode\`) y ejecutarlo por path.

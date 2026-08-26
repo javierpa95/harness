@@ -48,6 +48,23 @@ amplialo ahi si tu proyecto necesita mas guardas.
 Anade en su frontmatter un bloque `bash:` explicito (patrones con comodin, la
 ultima regla coincidente gana). Vuelve a optar al global borrando el bloque.
 
+## Gestion desde el dashboard (TUI)
+
+Vista **[5] Permisos** — todo lo de este documento, en pantalla:
+
+| Tecla | Accion |
+|-------|--------|
+| `A` | Activa modo AUTO (global) |
+| `S` | Activa modo SEGURO (global) |
+| `b` | Cicla el bash del agente seleccionado: heredar -> allow -> ask |
+| `Enter` | Detalle: TODAS las reglas declaradas del agente + avisos de salud |
+
+Los agentes con whitelist propia (auditores) aparecen como `whitelist` y la
+tecla `b` los rechaza: se editan a mano. Tras cambiar permisos, reinicia
+OpenCode.
+
+Equivalente CLI: `node .opencode/scripts/harness.mjs bash <agente> <inherit|allow|ask>`
+
 ## Verificacion
 
 ```bash

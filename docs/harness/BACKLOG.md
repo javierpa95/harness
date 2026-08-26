@@ -35,7 +35,7 @@ Prioridad propuesta: 🔥 alto | 🧊 medio | ❄️ algún día
 - [x] Backlog de PROYECTO (docs/BACKLOG.md) creado y cableado a AGENTS.md, /start y vista Backlog del TUI (toggle 'b') (2026-08-25)
 - [x] Vista "auditoría" + comando `make doctor`: permisos efectivos por agente y checks de salud (memoria escribible, read:'allow' traidor, formato de model, default_agent válido, tools deprecado) con prueba bug-inyectado/limpio (2026-08-25)
 - [ ] 🧊 Toggle on/off de agentes por stack (equivalente visual a borrar el .md, reversible)
-- [ ] 🧊 Editor de permisos por agente (whitelist de rutas editables) con preview del diff
+- [x] 🧊 Editor de permisos granular: vista Permisos del TUI con modo global (A/S), ciclo bash por agente (b) y detalle completo de reglas declaradas; editor completo de whitelists edit sigue abierto (2026-08-25)
 - [ ] 🧊 Gestor de MCP servers (enable/disable sin editar jsonc a mano)
 - [ ] ❄️ Modo "doctor": valida JSONC + frontmatter + rutas referenciadas en un solo pase
 - [ ] ❄️ Refresco automático de la barra de estado (fs.watch sobre .opencode/)

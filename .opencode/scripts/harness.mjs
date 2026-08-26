@@ -339,6 +339,8 @@ Comandos:
   backlog [project|harness]    Items abiertos (default: proyecto)
   doctor                       Auditoria de salud: permisos, modelos, config
   mode [auto|seguro]           Muestra o cambia el modo de permisos bash
+  bash <agente> <estado>       bash de un agente: inherit | allow | ask
+                               (los que tienen whitelist propia se editan a mano)
   tui                          Dashboard interactivo (igual que sin argumentos)
   help                         Esta ayuda
 `);
@@ -538,8 +540,91 @@ function collectAudit() {
   });
 }
 
-function defaultAgentCheck() {
+// ---------- per-agent bash level (granular permission control) ----------
+
+/** Classify an agent's declared bash: 'inherit' | 'allow' | 'ask' | 'locked'. */
+function agentBashState(fmLines) {
+  const perm = parsePermissionBlock(fmLines || []);
+  if (!perm || !('bash' in perm)) return { state: 'inherit', kind: 'none' };
+  const b = perm.bash;
+  if (typeof b === 'string') {
+    if (b === 'allow' || b === 'ask') return { state: b, kind: 'scalar' };
+    return { state: b, kind: 'scalar' };
+  }
+  return { state: 'locked', kind: 'object' }; // whitelist object: manual only
+}
+
+/**
+ * Set an agent's bash to inherit (remove declaration) or a scalar value.
+ * Refuses to touch whitelist-object declarations.
+ */
+function setAgentBash(fileName, state) {
+  if (!['inherit', 'allow', 'ask'].includes(state)) throw new Error(`Estado invalido: ${state}`);
+  const filePath = path.join(AGENTS_DIR, fileName);
+  const { body, eol } = readAgentFile(filePath);
+  const open = body.indexOf('---');
+  const close = body.indexOf('---', open + 1);
+  if (open !== 0 || close === -1) throw new Error(`${fileName}: frontmatter invalido`);
+
+  const fm = [...body.slice(open + 1, close)];
+  const cur = agentBashState(fm);
+  if (cur.kind === 'object') throw new Error(`${fileName}: su bash es una whitelist propia — edita el .md a mano`);
+
+  const pIdx = fm.findIndex((l) => /^permission:\s*$/.test(l));
+  if (pIdx === -1) throw new Error(`${fileName}: sin bloque permission`);
+
+  // Locate the existing top-level-in-permission bash line and its continuation
+  // block (lines indented deeper than the key itself).
+  let start = -1;
+  for (let i = pIdx + 1; i < fm.length; i++) {
+    if (/^\s{2}bash:\s?/.test(fm[i])) { start = i; break; }
+    if (/^\S/.test(fm[i])) break; // left the permission block
+  }
+  if (start !== -1) {
+    let end = start + 1;
+    while (end < fm.length && (/^\s{3,}/.test(fm[end]) || !fm[end].trim())) end++;
+    fm.splice(start, end - start);
+  }
+
+  if (state !== 'inherit') {
+    // Insert at the end of the permission block (before next indent-0 key).
+    let insertAt = fm.length;
+    for (let i = pIdx + 1; i < fm.length; i++) {
+      if (/^\S/.test(fm[i])) { insertAt = i; break; }
+    }
+    fm.splice(insertAt, 0, `  bash: '${state}'`);
+  }
+
+  const next = [...body.slice(0, open + 1), ...fm, ...body.slice(close)];
+  fs.writeFileSync(filePath, next.join(eol), 'utf8');
+
+  // Sanity: re-parse what we wrote.
+  const check = parsePermissionBlock(readAgentFile(filePath).fmLines || []);
+  const now = agentBashState(readAgentFile(filePath).fmLines || []);
+  if (state === 'inherit' && now.state !== 'inherit') throw new Error('verificacion fallida tras escribir');
+  if (state !== 'inherit' && now.state !== state) throw new Error('verificacion fallida tras escribir');
+  void check;
+  return now.state;
+}
+
+function cmdBash(agentArg, val) {
+  if (!agentArg || !val) {
+    console.error('Uso: node .opencode/scripts/harness.mjs bash <agente> <inherit|allow|ask>');
+    process.exit(1);
+  }
+  const wanted = agentArg.replace(/\.md$/, '');
+  const file = listAgentFiles().find((f) => f.replace(/\.md$/, '') === wanted);
+  if (!file) { console.error(`[ERROR] Agente no encontrado: "${wanted}"`); process.exit(1); }
   try {
+    const now = setAgentBash(file, val.toLowerCase());
+    console.log(`[OK] ${wanted}: bash -> ${now}. Reinicia OpenCode para aplicar.`);
+  } catch (e) {
+    console.error(`[ERROR] ${e.message}`);
+    process.exit(1);
+  }
+}
+
+function defaultAgentCheck() {  try {
     const cfg = JSON.parse(stripJsonc(fs.readFileSync(path.join(ROOT, '.opencode', 'opencode.jsonc'), 'utf8')));
     const name = cfg.default_agent;
     const hit = listAgentFiles().map(agentSummary).find((r) => r.name === name);
@@ -676,8 +761,8 @@ async function cmdTui() {
     { id: 'agents', title: 'Agentes', hint: 'Enter=modelo · i=heredar · Esc=volver' },
     { id: 'skills', title: 'Skills', hint: 'Esc=volver' },
     { id: 'backlog', title: 'Backlog', hint: 'b=fuente (proyecto/harness) · Esc=volver' },
-    { id: 'providers', title: 'Proveedores', hint: 'Esc=volver' },
-    { id: 'audit', title: 'Auditoria', hint: 'Enter=detalle · r=reescribir · Esc=volver' },
+    { id: 'providers', title: 'Prov.', hint: 'Esc=volver' },
+    { id: 'permisos', title: 'Permisos', hint: 'A=auto · S=seguro · b=bash del agente · Enter=detalle' },
     { id: 'help', title: 'Ayuda', hint: 'Esc=volver' },
   ];
 
@@ -768,42 +853,62 @@ async function cmdTui() {
       return lines;
     }
 
-    if (v.id === 'audit') {
+    if (v.id === 'permisos') {
       const rows = collectAudit();
-      if (detail && detail.type === 'audit-expand') {
+
+      if (detail && detail.type === 'perm-expand') {
         const a = rows[detail.index];
+        const perm = parsePermissionBlock(a.fm);
         lines.push(`${C.bold}  ${a.name}${C.reset}  ${C.dim}[${a.mode}]${C.reset}`);
-        const editDesc = typeof a.effEdit === 'string'
-          ? a.effEdit
-          : `${Object.entries(a.effEdit)[0]?.[1] || '?'} (catch-all) + ${Math.max(0, Object.keys(a.effEdit).length - 1)} reglas`;
-        lines.push(`  edit : ${C.cyan}${editDesc}${C.reset}`);
-        for (const [pat, act] of Object.entries(typeof a.effEdit === 'object' ? a.effEdit : {})) {
-          if (act === 'allow') lines.push(`         ${C.green}+ ${pat}${C.reset}`);
-        }
-        lines.push(`  bash : ${C.cyan}${typeof a.effBash === 'string' ? a.effBash : 'reglas propias'}${C.reset}`);
         lines.push('');
-        if (!a.auditIssues.length) lines.push(`  ${C.green}Sin avisos.${C.reset}`);
+        if (!perm) {
+          lines.push(C.dim + '  (sin permission declarado — hereda todo el global)' + C.reset);
+        } else {
+          for (const [k, val] of Object.entries(perm)) {
+            if (typeof val === 'string') {
+              const color = val === 'allow' ? C.green : val === 'ask' ? C.yellow : C.red;
+              lines.push(`  ${k.padEnd(11)} ${color}${val}${C.reset}`);
+            } else {
+              lines.push(`  ${k}:`);
+              for (const [pat, act] of Object.entries(val)) {
+                const color = act === 'allow' ? C.green : act === 'ask' ? C.yellow : C.red;
+                lines.push(`    ${C.dim}${pat.slice(0, 30).padEnd(32)}${C.reset}${color}${act}${C.reset}`);
+              }
+            }
+          }
+        }
+        const bs = agentBashState(a.fm);
+        lines.push('');
+        lines.push(C.dim + `  bash efectivo: ${bs.state === 'inherit' ? 'hereda del modo global' : 'propio (' + bs.state + ')'}${C.reset}`);
+        if (!a.auditIssues.length) lines.push(`  ${C.green}Sin avisos de salud.${C.reset}`);
         a.auditIssues.forEach((it) => {
           const color = it.sev === 'high' ? C.red : it.sev === 'med' ? C.yellow : C.dim;
           lines.push(`  ${color}* (${it.sev}) ${it.msg}${C.reset}`);
         });
-        lines.push('');
-        lines.push(C.dim + '  Esc: volver a la lista' + C.reset);
         return lines;
       }
-      const da = defaultAgentCheck();
-      lines.push(da.ok
-        ? `  ${C.green}[OK]${C.reset} ${da.msg}`
-        : `  ${C.red}[ALTA]${C.reset} ${da.msg}`);
+
+      // Matrix list
+      const mode = getMode();
+      lines.push(`  Modo global bash: ${mode === 'auto'
+        ? C.green + 'AUTO' + C.reset + C.dim + '  [A] activar' + C.reset
+        : C.yellow + 'SEGURO' + C.reset + C.dim + '  [S] activar' + C.reset}`);
+      lines.push(C.dim + '  [b] cicla el bash del agente: heredar -> allow -> ask' + C.reset);
       lines.push('');
       rows.forEach((a, i) => {
         const cur = i === cursor;
         const marker = cur ? `${C.green}>${C.reset}` : ' ';
+        const bs = agentBashState(a.fm);
+        const bTag = bs.kind === 'object'
+          ? `${C.cyan}whitelist${C.reset}`
+          : bs.state === 'inherit'
+            ? `${C.dim}hereda (${mode})${C.reset}`
+            : bs.state === 'allow' ? `${C.green}allow propio${C.reset}` : `${C.yellow}ask propio${C.reset}`;
         const flag = a.auditIssues.length
-          ? `${a.auditIssues.some((x) => x.sev === 'high') ? C.red : C.yellow}!${a.auditIssues.length}${C.reset}`
-          : `${C.dim}.${C.reset}`;
-        const name = cur ? C.bold + a.name.padEnd(22) + C.reset : a.name.padEnd(22);
-        lines.push(` ${marker} ${name} ${flag}`);
+          ? ` ${a.auditIssues.some((x) => x.sev === 'high') ? C.red : C.yellow}!${a.auditIssues.length}${C.reset}`
+          : '';
+        const name = cur ? C.bold + a.name.padEnd(20) + C.reset : a.name.padEnd(20);
+        lines.push(` ${marker} ${name} ${bTag}${flag}`);
       });
       return lines;
     }
@@ -946,20 +1051,41 @@ async function cmdTui() {
         }
       }
 
-      // Audit view: navigate and expand per-agent findings.
-      if (viewIdx === 4 && VIEWS[viewIdx].id === 'audit') {
-        if (detail && detail.type === 'audit-expand') {
+      // Permisos view: global mode, per-agent bash cycle, expand detail.
+      if (viewIdx === 4 && VIEWS[viewIdx].id === 'permisos') {
+        if (detail && detail.type === 'perm-expand') {
           if (key.name === 'escape' || key.name === 'return') {
             detail = null;
-            status = 'Lista de la auditoria.';
+            status = 'Matriz de permisos.';
           }
         } else {
-          const count = collectAudit().length;
-          if (key.name === 'up') cursor = (cursor - 1 + count) % count;
+          const rows = collectAudit();
+          const count = rows.length;
+
+          if (key.name === 'a') {
+            try { setMode('auto'); status = `Modo AUTO activado — reinicia OpenCode para aplicar.`; }
+            catch (e) { status = `${C.red}${e.message}${C.reset}`; }
+          } else if (key.name === 's') {
+            try { setMode('seguro'); status = `Modo SEGURO activado — reinicia OpenCode para aplicar.`; }
+            catch (e) { status = `${C.red}${e.message}${C.reset}`; }
+          } else if (key.name === 'b') {
+            const a = rows[cursor];
+            const bs = agentBashState(a.fm);
+            if (bs.kind === 'object') {
+              status = `${a.name}: whitelist propia — se edita a mano en el .md`;
+            } else {
+              const nextMap = { inherit: 'allow', allow: 'ask', ask: 'inherit' };
+              const target = nextMap[bs.state] || 'inherit';
+              try {
+                const now = setAgentBash(a.file, target);
+                status = `${a.name}: bash -> ${now}`;
+              } catch (e) { status = `${C.red}${e.message}${C.reset}`; }
+            }
+          } else if (key.name === 'up') cursor = (cursor - 1 + count) % count;
           else if (key.name === 'down') cursor = (cursor + 1) % count;
           else if (key.name === 'return') {
-            detail = { type: 'audit-expand', index: cursor };
-            status = 'Hallazgos del agente.';
+            detail = { type: 'perm-expand', index: cursor };
+            status = 'Todas las reglas declaradas del agente.';
           }
         }
       }
@@ -994,6 +1120,9 @@ switch (cmd || 'tui') {
     break;
   case 'mode':
     cmdMode(args[0]);
+    break;
+  case 'bash':
+    cmdBash(args[0], args[1]);
     break;
   case 'tui':
     await cmdTui();

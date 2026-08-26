@@ -8,7 +8,6 @@ permission:
   edit:
     '*': 'deny'
     'docs/features/**/*': 'allow'
-  bash: 'ask'
   question: 'allow'
 ---
 

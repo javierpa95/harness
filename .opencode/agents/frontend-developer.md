@@ -9,7 +9,6 @@ permission:
     '*': 'deny'
     'apps/web/**/*': 'allow'
     'docs/features/**/*': 'allow'
-  bash: 'ask'
   question: 'allow'
 ---
 

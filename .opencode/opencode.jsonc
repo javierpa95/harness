@@ -27,7 +27,15 @@
       "**/pb_data/**/*": "deny",
       "**/*.db": "deny"
     },
-    "bash": "ask"
+    // Nivel de bash GLOBAL gestionado por `make mode` (bloque harness:).
+    // No editar a mano: se sobrescribe al cambiar de modo.
+    // AUTO  = todo permitido salvo suelo anti-desastres (rm -rf, force-push...)
+    // SEGURO = preguntar para cualquier comando
+    // harness:bash:start modo=seguro
+    "bash": {
+      "*": "ask"
+    }
+    // harness:bash:end
   },
   // ============================================================
   // MCP Servers

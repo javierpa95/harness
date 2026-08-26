@@ -10,7 +10,6 @@ permission:
     'services/backend/**/*': 'allow'
     'docs/features/**/*': 'allow'
     'agent-memory/backend-developer/**/*': 'allow'
-  bash: 'ask'
   question: 'allow'
 ---
 

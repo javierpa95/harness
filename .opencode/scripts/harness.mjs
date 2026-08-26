@@ -338,9 +338,91 @@ Comandos:
   skills                       Lista las skills disponibles
   backlog [project|harness]    Items abiertos (default: proyecto)
   doctor                       Auditoria de salud: permisos, modelos, config
+  mode [auto|seguro]           Muestra o cambia el modo de permisos bash
   tui                          Dashboard interactivo (igual que sin argumentos)
   help                         Esta ayuda
 `);
+}
+
+// ---------- permission mode manager (managed bash block in opencode.jsonc) ----------
+
+const BASH_START = /\/\/\s*harness:bash:start\s*modo=(\w+)/;
+const BASH_END_MARKER = '// harness:bash:end';
+
+// Value of permission.bash per mode. Lines are prefixed with the block indent
+// by setMode(); keep them relative and simple.
+const MODE_PRESETS = {
+  auto: [
+    // sin coma final: bash es la ultima propiedad de "permission"
+    '"bash": {',
+    '  "*": "allow",',
+    '  // suelo anti-desastres: preguntan aunque estes en AUTO',
+    '  "rm -rf *": "ask",',
+    '  "sudo *": "ask",',
+    '  "git push --force*": "ask",',
+    '  "git reset --hard*": "ask"',
+    '}'
+  ],
+  seguro: [
+    '"bash": {',
+    '  "*": "ask"',
+    '}'
+  ],
+};
+
+function configPath() {
+  return path.join(ROOT, '.opencode', 'opencode.jsonc');
+}
+
+function getMode() {
+  try {
+    const raw = fs.readFileSync(configPath(), 'utf8');
+    const m = raw.match(BASH_START);
+    return m && m[1] === 'auto' ? 'auto' : 'seguro';
+  } catch {
+    return 'seguro';
+  }
+}
+
+function setMode(mode) {
+  if (!MODE_PRESETS[mode]) throw new Error(`Modo desconocido: "${mode}" (usa auto | seguro)`);
+  const raw = fs.readFileSync(configPath(), 'utf8');
+  const eol = raw.includes('\r\n') ? '\r\n' : '\n';
+  const lines = raw.split(/\r?\n/);
+  const si = lines.findIndex((l) => BASH_START.test(l));
+  const ei = lines.findIndex((l) => l.trim() === BASH_END_MARKER);
+  if (si === -1 || ei === -1 || ei < si) throw new Error('Bloque gestionado harness:bash no encontrado en opencode.jsonc');
+
+  const indent = lines[si].match(/^\s*/)[0];
+  const replacement = [
+    indent + `// harness:bash:start modo=${mode}`,
+    ...MODE_PRESETS[mode].map((l) => indent + l),
+    indent + BASH_END_MARKER,
+  ];
+  lines.splice(si, ei - si + 1, ...replacement);
+
+  const out = lines.join(eol);
+  // OpenCode tolera comas colgantes (schema allowTrailingCommas): validar en
+  // modo tolerante para no rechazar configs legitimas del usuario.
+  JSON.parse(stripJsonc(out).replace(/,\s*([}\]])/g, '$1'));
+  fs.writeFileSync(configPath(), out, 'utf8');
+  return mode;
+}
+
+function cmdMode(newMode) {
+  if (!newMode) {
+    const mode = getMode();
+    console.log('');
+    console.log(`Modo de permisos actual: ${mode === 'auto' ? 'AUTO (todo allow; preguntan rm -rf/sudo/force-push)' : 'SEGURO (bash pregunta)'}`);
+    console.log('Cambiar con: make mode MODE=auto   |   make mode MODE=seguro');
+    console.log('');
+    return;
+  }
+  const target = String(newMode).toLowerCase();
+  const before = getMode();
+  setMode(target);
+  console.log(`[OK] Modo: ${before} -> ${target}. Reinicia OpenCode para que aplique.`);
+  console.log('');
 }
 
 // ---------- audit engine (shared by `doctor` CLI and the TUI audit view) ----------
@@ -473,6 +555,16 @@ function cmdDoctor() {
   console.log('');
   console.log('Doctor del harness — auditoria de agentes');
   console.log('='.repeat(60));
+
+  const mode = getMode();
+  console.log(`  [MODO] ${mode === 'auto' ? 'AUTO — bash permitido salvo suelo anti-desastres' : 'SEGURO — bash pregunta antes de ejecutar'}`);
+  const askers = listAgentFiles().map(agentSummary).filter((a) => {
+    const { fmLines } = readAgentFile(path.join(AGENTS_DIR, a.file));
+    const p = parsePermissionBlock(fmLines || []);
+    return typeof p?.bash === 'string' ? p.bash === 'ask' : p?.bash?.['*'] === 'ask';
+  });
+  console.log(`  Agentes con bash propio que preguntan: ${askers.length ? askers.map((a) => a.name).join(', ') : '(ninguno)'}`);
+  console.log('');
 
   const daCheck = defaultAgentCheck();
   console.log(`  ${daCheck.ok ? '[OK]  ' : '[ALTA]'} ${daCheck.msg}`);
@@ -730,6 +822,10 @@ async function cmdTui() {
   function draw() {
     const v = VIEWS[viewIdx];
     const g = gitStatus();
+    const mode = getMode();
+    const modeTxt = mode === 'auto'
+      ? `${C.green}AUTO${C.reset}`
+      : `${C.yellow}SEGURO${C.reset}`;
     const gitTxt = g.dirty
       ? `${C.yellow}${g.branch}${C.reset} · ${g.dirty} sin commit`
       : `${C.green}${g.branch}${C.reset} · limpio`;
@@ -748,7 +844,7 @@ async function cmdTui() {
     const out = [
       HOME,
       boxTop(),
-      boxLine(`${C.bold}${C.cyan}HARNESS${C.reset} ${C.dim}·${C.reset} ${projectName()}   ${C.dim}|${C.reset}   ${gitTxt}`),
+      boxLine(`${C.bold}${C.cyan}HARNESS${C.reset} ${C.dim}·${C.reset} ${projectName()}   ${C.dim}|${C.reset}   modo:${modeTxt}   ${C.dim}|${C.reset}   ${gitTxt}`),
       boxLine(tabs),
       boxSep(),
       ...body.map((l) => boxLine(l)),
@@ -773,6 +869,18 @@ async function cmdTui() {
 
       // Manual refresh from anywhere.
       if (key.name === 'r' && !detail) { status = 'Vista reescrita.'; continue; }
+
+      // Toggle permission mode from anywhere.
+      if (key.name === 'm' && !detail) {
+        try {
+          const next = getMode() === 'auto' ? 'seguro' : 'auto';
+          setMode(next);
+          status = `Modo cambiado a ${next.toUpperCase()} — reinicia OpenCode para aplicar.`;
+        } catch (e) {
+          status = `${C.red}${e.message}${C.reset}`;
+        }
+        continue;
+      }
 
       // Global view switch (only outside sub-menus).
       if (!detail && /^[1-6]$/.test(key.sequence || key.str || key.name)) {
@@ -883,6 +991,9 @@ switch (cmd || 'tui') {
     break;
   case 'doctor':
     cmdDoctor();
+    break;
+  case 'mode':
+    cmdMode(args[0]);
     break;
   case 'tui':
     await cmdTui();

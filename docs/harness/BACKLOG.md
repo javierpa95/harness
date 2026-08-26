@@ -27,6 +27,7 @@ Prioridad propuesta: 🔥 alto | 🧊 medio | ❄️ algún día
 
 ### Items concretos
 
+- [x] Overhaul visual del dashboard: altura fija, sin parpadeo, bordes a prueba de desbordes, alt-screen, geometria con autotest (2026-08-25)
 - [x] Deteccion de la instalacion OpenCode en el dashboard/CLI: config global+proyecto, proveedores con auth (solo nombres), modelos declarados en config (2026-08-25)
 - [ ] 🔥 Wizard de modelos con lista de modelos recientes/sugeridos (no tener que teclear el ID)
       — parcial: el prompt ya lista proveedores auth y modelos declarados; falta catalogo completo

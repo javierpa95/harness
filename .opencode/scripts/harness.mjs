@@ -497,13 +497,41 @@ const C = {
   reset: '\x1b[0m', bold: '\x1b[1m', dim: '\x1b[2m', inverse: '\x1b[7m',
   cyan: '\x1b[36m', green: '\x1b[32m', yellow: '\x1b[33m', red: '\x1b[31m',
 };
-const CLEAR = '\x1b[2J\x1b[H';
-const WIDTH = 70;
+const HOME = '\x1b[H'; // cursor home (no full clear -> no flicker)
+const CLR_EOL = '\x1b[K'; // clear to end of line
+const HIDE_CURSOR = '\x1b[?25l';
+const SHOW_CURSOR = '\x1b[?25h';
+const ENTER_ALT = '\x1b[?1049h'; // alternate screen: terminal restored on exit
+const LEAVE_ALT = '\x1b[?1049l';
 
-function boxLine(content, width = WIDTH) {
-  const visible = content.replace(/\x1b\[[0-9;]*m/g, ''); // strip ANSI to measure
-  const pad = Math.max(0, width - 2 - visible.length);
-  return `│ ${content}${' '.repeat(pad)}│`;
+// Frame geometry: fixed height so switching views never jumps.
+const W = 72;
+const BODY_ROWS = 15;
+
+function visLen(s) {
+  return s.replace(/\x1b\[[0-9;]*m/g, '').length;
+}
+
+/** Clamp a decorated string to the inner width; falls back to plain on overflow. */
+function fit(content) {
+  if (visLen(content) <= W - 4) return content;
+  return content.replace(/\x1b\[[0-9;]*m/g, '').slice(0, W - 4);
+}
+
+function boxLine(content) {
+  const c = fit(content);
+  // borders(2) + leading space(1) + content + trailing space(1) = W
+  return `│ ${c}${' '.repeat(Math.max(0, W - 4 - visLen(c)))} │`;
+}
+
+function boxTop(ch = '┌') {
+  return C.dim + ch + '─'.repeat(W - 2) + '┐' + C.reset;
+}
+function boxBottom() {
+  return C.dim + '└' + '─'.repeat(W - 2) + '┘' + C.reset;
+}
+function boxSep() {
+  return C.dim + '├' + '─'.repeat(W - 2) + '┤' + C.reset;
 }
 
 function enableRawMode() {
@@ -553,12 +581,12 @@ async function cmdTui() {
   }
 
   const VIEWS = [
-    { id: 'agents', title: 'Agentes & Modelos', hint: 'Enter=modelo · i=heredar · Esc=volver' },
+    { id: 'agents', title: 'Agentes', hint: 'Enter=modelo · i=heredar · Esc=volver' },
     { id: 'skills', title: 'Skills', hint: 'Esc=volver' },
-    { id: 'backlog', title: 'Backlog', hint: 'b=cambiar fuente (proyecto/harness) · Esc=volver' },
+    { id: 'backlog', title: 'Backlog', hint: 'b=fuente (proyecto/harness) · Esc=volver' },
     { id: 'providers', title: 'Proveedores', hint: 'Esc=volver' },
-    { id: 'audit', title: 'Auditoria', hint: 'Enter=detalle del agente · r=reescribir · Esc=volver' },
-    { id: 'help', title: 'Ayuda rapida', hint: 'Esc=volver' },
+    { id: 'audit', title: 'Auditoria', hint: 'Enter=detalle · r=reescribir · Esc=volver' },
+    { id: 'help', title: 'Ayuda', hint: 'Esc=volver' },
   ];
 
   let viewIdx = 0;
@@ -611,12 +639,13 @@ async function cmdTui() {
       const file = backlogSource === 'project' ? PROJECT_BACKLOG_FILE : HARNESS_BACKLOG_FILE;
       lines.push(`  Fuente: ${backlogSource === 'project'
         ? C.bold + 'docs/BACKLOG.md (proyecto)' + C.reset
-        : C.bold + 'docs/harness/BACKLOG.md (harness)' + C.reset}  ${C.dim}[b alterna]${C.reset}`);
+        : C.bold + 'docs/harness/BACKLOG.md (harness)' + C.reset}`);
+      lines.push(C.dim + '  [b] alterna entre proyecto y harness' + C.reset);
       lines.push('');
       const items = backlogItems(file);
       if (!items.length) lines.push(`  (sin items abiertos${backlogSource === 'project' ? ' — las ideas futuras van aqui' : ''})`);
-      items.slice(0, 10).forEach((it) => lines.push(`  ${C.yellow}[ ]${C.reset} ${it.slice(0, 58)}`));
-      if (items.length > 10) lines.push(C.dim + `  ... y ${items.length - 10} mas` + C.reset);
+      items.slice(0, 8).forEach((it) => lines.push(`  ${C.yellow}[ ]${C.reset} ${it.slice(0, 56)}`));
+      if (items.length > 8) lines.push(C.dim + `  ... y ${items.length - 8} mas` + C.reset);
       return lines;
     }
 
@@ -627,24 +656,21 @@ async function cmdTui() {
       lines.push('');
       if (s.authedProviders.length) {
         lines.push(`  ${C.green}Con auth:${C.reset}`);
-        s.authedProviders.forEach((p) => lines.push(`    ${C.green}*${C.reset} ${p}`));
+        s.authedProviders.slice(0, 5).forEach((p) => lines.push(`    ${C.green}*${C.reset} ${p}`));
+        if (s.authedProviders.length > 5) lines.push(C.dim + `    ... y ${s.authedProviders.length - 5} mas` + C.reset);
       } else {
         lines.push(C.dim + '  Sin proveedores autenticados ("opencode auth login")' + C.reset);
       }
       const onlyCfg = s.configuredProviders.filter((x) => !s.authedProviders.includes(x));
       if (onlyCfg.length) {
-        lines.push(`  ${C.dim}Solo en config: ${onlyCfg.join(', ')}${C.reset}`);
-      }
-      if (s.agentOverrides.length) {
-        lines.push('');
-        s.agentOverrides.slice(0, 3).forEach((o) => lines.push(C.dim + '  ' + o.slice(0, 60) + C.reset));
+        lines.push(`  ${C.dim}Solo en config: ${onlyCfg.join(', ').slice(0, 44)}${C.reset}`);
       }
       const declEntries = Object.entries(s.declaredModels).filter(([, v]) => v.length);
       if (declEntries.length) {
         lines.push('');
         lines.push(`  ${C.bold}Modelos declarados en config:${C.reset}`);
-        for (const [k, ids] of declEntries.slice(0, 4)) {
-          lines.push(`    ${C.cyan}${k}${C.reset} ${C.dim}: ${ids.slice(0, 3).join(', ')}${ids.length > 3 ? `, +${ids.length - 3}` : ''}${C.reset}`);
+        for (const [k, ids] of declEntries.slice(0, 3)) {
+          lines.push(`    ${C.cyan}${k}${C.reset} ${C.dim}: ${ids.slice(0, 3).join(', ').slice(0, 34)}${ids.length > 3 ? `, +${ids.length - 3}` : ''}${C.reset}`);
         }
       }
       return lines;
@@ -705,31 +731,38 @@ async function cmdTui() {
     const v = VIEWS[viewIdx];
     const g = gitStatus();
     const gitTxt = g.dirty
-      ? `${C.yellow}${g.branch}${C.reset} · ${g.dirty} cambio(s) sin commit`
+      ? `${C.yellow}${g.branch}${C.reset} · ${g.dirty} sin commit`
       : `${C.green}${g.branch}${C.reset} · limpio`;
 
-    const tabs = VIEWS.map((x, i) =>
-      i === viewIdx ? `${C.inverse} ${i + 1} ${x.title} ${C.reset}` : `${C.dim} ${i + 1} ${x.title} ${C.reset}`,
-    ).join(' ');
+    // Tab bar: compact cells guaranteed to fit even with all six views.
+    const tabs = VIEWS.map((x, i) => {
+      const label = ` ${i + 1}\u00b7${x.title}`;
+      return i === viewIdx ? C.inverse + label + C.reset : C.dim + label + C.reset;
+    }).join(' ');
+
+    // Fixed-height body: pad to BODY_ROWS, never overflow.
+    const body = renderViewBody();
+    while (body.length < BODY_ROWS) body.push('');
+    body.length = BODY_ROWS;
 
     const out = [
-      CLEAR,
-      C.dim + '┌' + '─'.repeat(WIDTH - 2) + '┐' + C.reset,
-      boxLine(`${C.bold}HARNESS${C.reset} · ${projectName()}   ${C.dim}|${C.reset}  ${gitTxt}`),
+      HOME,
+      boxTop(),
+      boxLine(`${C.bold}${C.cyan}HARNESS${C.reset} ${C.dim}·${C.reset} ${projectName()}   ${C.dim}|${C.reset}   ${gitTxt}`),
       boxLine(tabs),
-      C.dim + '├' + '─'.repeat(WIDTH - 2) + '┤' + C.reset,
-      ...renderViewBody().map((l) => boxLine(l)),
-      '',
-      C.dim + '├' + '─'.repeat(WIDTH - 2) + '┤' + C.reset,
-      boxLine(`${C.dim}${v.hint}   ·   [q] salir${C.reset}`),
+      boxSep(),
+      ...body.map((l) => boxLine(l)),
+      boxSep(),
+      boxLine(C.dim + v.hint + C.reset),
       boxLine(`${C.green}»${C.reset} ${status}`),
-      C.dim + '└' + '─'.repeat(WIDTH - 2) + '┘' + C.reset,
-    ].join('\n');
+      boxBottom(),
+    ].join('\n' + CLR_EOL + '\n') + CLR_EOL;
 
-    process.stdout.write(out + '\n');
+    process.stdout.write(out);
   }
 
   enableRawMode();
+  process.stdout.write(ENTER_ALT + HIDE_CURSOR);
   try {
     for (;;) {
       draw();
@@ -770,8 +803,10 @@ async function cmdTui() {
               for (const [k, ids] of decl.slice(0, 3)) {
                 hint += `\n ${k}: ${ids.join(', ')}`;
               }
+              process.stdout.write(SHOW_CURSOR);
               const answer = await askLine(`${hint ? hint + '\n' : ''} Nuevo modelo para ${a.name} (provider/model-id | inherit | vacio cancela): `);
               enableRawMode(); // askLine dropped us back to cooked mode
+              process.stdout.write(HIDE_CURSOR);
               if (!answer) { status = 'Cancelado.'; }
               else {
                 try { status = applyModelChange(a.file, answer); }
@@ -823,6 +858,7 @@ async function cmdTui() {
     }
   } finally {
     disableRawMode();
+    process.stdout.write(SHOW_CURSOR + LEAVE_ALT);
   }
   console.log('Dashboard cerrado. Hasta la proxima sesion.');
 }

@@ -337,12 +337,160 @@ Comandos:
                                Usa "inherit" para volver al modelo global
   skills                       Lista las skills disponibles
   backlog [project|harness]    Items abiertos (default: proyecto)
+  doctor                       Auditoria de salud: permisos, modelos, config
   tui                          Dashboard interactivo (igual que sin argumentos)
   help                         Esta ayuda
 `);
 }
 
+// ---------- audit engine (shared by `doctor` CLI and the TUI audit view) ----------
+
+/**
+ * Minimal YAML-subset parser for the `permission:` block of our agent
+ * frontmatter. Supports exactly the shapes this template uses:
+ *   permission:            <- top key
+ *     edit:                <- level-1 tool, scalar OR nested map
+ *       '*': 'deny'        <- level-2 pattern rules
+ */
+function parsePermissionBlock(fmLines) {
+  const start = fmLines.findIndex((l) => /^permission:\s*$/.test(l));
+  if (start === -1) return null;
+  const perm = {};
+  let current = null;
+  for (let i = start + 1; i < fmLines.length; i++) {
+    const line = fmLines[i];
+    if (!line.trim()) continue;
+    const indent = line.length - line.trimStart().length;
+    if (indent === 0) break; // next top-level frontmatter key
+    const m = line.trim().match(/^'?([^':]+)'?\s*:\s*(.*)$/);
+    if (!m) continue;
+    const key = m[1].trim();
+    const rawVal = m[2].trim().replace(/^['"]|['"]$/g, '');
+    if (indent <= 2) {
+      if (rawVal) { perm[key] = rawVal; current = null; }
+      else { perm[key] = {}; current = perm[key]; }
+    } else if (current) {
+      current[key] = rawVal;
+    }
+  }
+  return perm;
+}
+
+/** OpenCode-style wildcard match: * = zero+ ANY chars (incl. /), ? = one char.
+ *  Single pass over tokens — sequential replaces would contaminate each other
+ *  (the '?'/'*' inserted by earlier steps being re-transformed by later ones). */
+function globMatch(pattern, target) {
+  const rx = pattern.replace(/\*\*\/|\*\*|\*|\?|[^*?]+/g, (tok) => {
+    if (tok === '**/') return '(?:[\\s\\S]*/)?'; // cero o mas segmentos
+    if (tok === '**' || tok === '*') return '[\\s\\S]*';
+    if (tok === '?') return '.';
+    return tok.replace(/[.+^${}()|[\]\\]/g, '\\$&');
+  });
+  return new RegExp(`^${rx}$`).test(target);
+}
+
+/** Evaluate an edit rules object with "last matching rule wins". */
+function evalRules(rules, targetPath) {
+  if (!rules || typeof rules !== 'object') return rules || null; // flat string action
+  let action = null;
+  for (const [pat, act] of Object.entries(rules)) {
+    if (globMatch(pat, targetPath)) action = act;
+  }
+  return action;
+}
+
+/** Run health checks for one agent. Returns array of {sev, msg}. */
+function auditAgent(sum, bodyText, globalPerm) {
+  const issues = [];
+  const perm = parsePermissionBlock(sum.fm);
+
+  // 1. Memory writability: instructions mention MEMORY.md but edits deny it.
+  if (bodyText.includes(`agent-memory/${sum.name}/MEMORY.md`)) {
+    const allowed = evalRules(perm?.edit, `agent-memory/${sum.name}/MEMORY.md`) === 'allow';
+    if (!allowed) issues.push({ sev: 'high', msg: 'instruye escribir su MEMORY.md pero edit no lo permite' });
+  }
+
+  // 2. Traitor read allow (bypasses the global .env safety net).
+  if (/^\s*read:\s*['"]?allow['"]?\s*$/m.test(sum.fm.join('\n'))) {
+    issues.push({ sev: 'high', msg: "read:'allow' plano anula el deny global de .env*" });
+  }
+
+  // 3. Model format.
+  if (sum.model && !MODEL_RE.test(sum.model)) {
+    issues.push({ sev: 'med', msg: `model "${sum.model}" no cumple provider/model-id` });
+  }
+
+  // 4. Description quality (drives subagent delegation).
+  if ((sum.description || '').length < 15) {
+    issues.push({ sev: 'low', msg: 'description muy corta: OpenCode delega peor' });
+  }
+
+  // 5. Deprecated tools block should be gone.
+  if (sum.fm.some((l) => /^tools:\s*$/.test(l))) {
+    issues.push({ sev: 'low', msg: 'usa tools: deprecado (v1.1.1 fusion en permission)' });
+  }
+
+  return { issues, perm };
+}
+
+function collectAudit() {
+  const setup = detectOpencodeSetup();
+  let globalPerm = null;
+  try {
+    const cfgPath = path.join(ROOT, '.opencode', 'opencode.jsonc');
+    const cfg = JSON.parse(stripJsonc(fs.readFileSync(cfgPath, 'utf8')));
+    globalPerm = cfg.permission || null;
+  } catch { /* project config unreadable; agent-level checks still run */ }
+
+  return listAgentFiles().map((f) => {
+    const raw = fs.readFileSync(path.join(AGENTS_DIR, f), 'utf8');
+    const { fmLines, body } = readAgentFile(path.join(AGENTS_DIR, f));
+    const s = agentSummary(f);
+    s.fm = fmLines || [];
+    s.description = getFrontmatterValue(fmLines, 'description');
+    const { issues, perm } = auditAgent(s, body.join('\n'), globalPerm);
+    s.auditIssues = issues;
+    s.effEdit = perm?.edit ?? globalPerm?.edit ?? '(default)';
+    s.effBash = perm?.bash ?? globalPerm?.bash ?? '(default)';
+    return s;
+  });
+}
+
+function defaultAgentCheck() {
+  try {
+    const cfg = JSON.parse(stripJsonc(fs.readFileSync(path.join(ROOT, '.opencode', 'opencode.jsonc'), 'utf8')));
+    const name = cfg.default_agent;
+    const hit = listAgentFiles().map(agentSummary).find((r) => r.name === name);
+    if (!hit) return { ok: false, msg: `default_agent "${name}" no existe entre los agentes` };
+    if (hit.mode !== 'primary') return { ok: false, msg: `default_agent "${name}" no es mode: primary` };
+    return { ok: true, msg: `default_agent "${name}" (primary, existe)` };
+  } catch {
+    return { ok: false, msg: 'opencode.jsonc ilegible' };
+  }
+}
+
+function cmdDoctor() {
+  console.log('');
+  console.log('Doctor del harness — auditoria de agentes');
+  console.log('='.repeat(60));
+
+  const daCheck = defaultAgentCheck();
+  console.log(`  ${daCheck.ok ? '[OK]  ' : '[ALTA]'} ${daCheck.msg}`);
+
+  let total = 0;
+  for (const a of collectAudit()) {
+    total += a.auditIssues.length;
+    const tag = a.auditIssues.length ? `${a.auditIssues.length} aviso(s)` : 'limpio';
+    console.log(`  ${a.auditIssues.length ? '[AVISO]' : '[OK]  '} ${a.name.padEnd(20)} ${tag}`);
+    for (const it of a.auditIssues) console.log(`         - (${it.sev}) ${it.msg}`);
+  }
+  console.log('='.repeat(60));
+  console.log(total ? `${total} aviso(s). Detalles arriba.` : 'Todo limpio.');
+  console.log('');
+}
+
 // ---------- interactive dashboard (v1) ----------
+
 
 // ANSI helpers (no deps). Windows Terminal / modern conhost render these fine.
 const C = {
@@ -409,6 +557,7 @@ async function cmdTui() {
     { id: 'skills', title: 'Skills', hint: 'Esc=volver' },
     { id: 'backlog', title: 'Backlog', hint: 'b=cambiar fuente (proyecto/harness) · Esc=volver' },
     { id: 'providers', title: 'Proveedores', hint: 'Esc=volver' },
+    { id: 'audit', title: 'Auditoria', hint: 'Enter=detalle del agente · r=reescribir · Esc=volver' },
     { id: 'help', title: 'Ayuda rapida', hint: 'Esc=volver' },
   ];
 
@@ -445,6 +594,9 @@ async function cmdTui() {
         const name = cur ? C.bold + a.name.padEnd(20) + C.reset : a.name.padEnd(20);
         lines.push(` ${marker} ${name} ${tag} ${model}`);
       });
+      const withModel = agents().filter((a) => a.model).length;
+      lines.push('');
+      lines.push(C.dim + `  ${agents().length} agentes · ${withModel} con modelo propio · resto hereda` + C.reset);
       return lines;
     }
 
@@ -498,6 +650,46 @@ async function cmdTui() {
       return lines;
     }
 
+    if (v.id === 'audit') {
+      const rows = collectAudit();
+      if (detail && detail.type === 'audit-expand') {
+        const a = rows[detail.index];
+        lines.push(`${C.bold}  ${a.name}${C.reset}  ${C.dim}[${a.mode}]${C.reset}`);
+        const editDesc = typeof a.effEdit === 'string'
+          ? a.effEdit
+          : `${Object.entries(a.effEdit)[0]?.[1] || '?'} (catch-all) + ${Math.max(0, Object.keys(a.effEdit).length - 1)} reglas`;
+        lines.push(`  edit : ${C.cyan}${editDesc}${C.reset}`);
+        for (const [pat, act] of Object.entries(typeof a.effEdit === 'object' ? a.effEdit : {})) {
+          if (act === 'allow') lines.push(`         ${C.green}+ ${pat}${C.reset}`);
+        }
+        lines.push(`  bash : ${C.cyan}${typeof a.effBash === 'string' ? a.effBash : 'reglas propias'}${C.reset}`);
+        lines.push('');
+        if (!a.auditIssues.length) lines.push(`  ${C.green}Sin avisos.${C.reset}`);
+        a.auditIssues.forEach((it) => {
+          const color = it.sev === 'high' ? C.red : it.sev === 'med' ? C.yellow : C.dim;
+          lines.push(`  ${color}* (${it.sev}) ${it.msg}${C.reset}`);
+        });
+        lines.push('');
+        lines.push(C.dim + '  Esc: volver a la lista' + C.reset);
+        return lines;
+      }
+      const da = defaultAgentCheck();
+      lines.push(da.ok
+        ? `  ${C.green}[OK]${C.reset} ${da.msg}`
+        : `  ${C.red}[ALTA]${C.reset} ${da.msg}`);
+      lines.push('');
+      rows.forEach((a, i) => {
+        const cur = i === cursor;
+        const marker = cur ? `${C.green}>${C.reset}` : ' ';
+        const flag = a.auditIssues.length
+          ? `${a.auditIssues.some((x) => x.sev === 'high') ? C.red : C.yellow}!${a.auditIssues.length}${C.reset}`
+          : `${C.dim}.${C.reset}`;
+        const name = cur ? C.bold + a.name.padEnd(22) + C.reset : a.name.padEnd(22);
+        lines.push(` ${marker} ${name} ${flag}`);
+      });
+      return lines;
+    }
+
     // help
     lines.push('  Que es esto: panel de control del harness SDD.');
     lines.push('');
@@ -546,8 +738,11 @@ async function cmdTui() {
       if (key.ctrl && key.name === 'c') break;
       if (key.name === 'q') break;
 
+      // Manual refresh from anywhere.
+      if (key.name === 'r' && !detail) { status = 'Vista reescrita.'; continue; }
+
       // Global view switch (only outside sub-menus).
-      if (!detail && /^[1-5]$/.test(key.sequence || key.str || key.name)) {
+      if (!detail && /^[1-6]$/.test(key.sequence || key.str || key.name)) {
         viewIdx = Number(key.sequence || key.str) - 1;
         cursor = 0;
         continue;
@@ -607,6 +802,24 @@ async function cmdTui() {
           backlogSource = backlogSource === 'project' ? 'harness' : 'project';
         }
       }
+
+      // Audit view: navigate and expand per-agent findings.
+      if (viewIdx === 4 && VIEWS[viewIdx].id === 'audit') {
+        if (detail && detail.type === 'audit-expand') {
+          if (key.name === 'escape' || key.name === 'return') {
+            detail = null;
+            status = 'Lista de la auditoria.';
+          }
+        } else {
+          const count = collectAudit().length;
+          if (key.name === 'up') cursor = (cursor - 1 + count) % count;
+          else if (key.name === 'down') cursor = (cursor + 1) % count;
+          else if (key.name === 'return') {
+            detail = { type: 'audit-expand', index: cursor };
+            status = 'Hallazgos del agente.';
+          }
+        }
+      }
     }
   } finally {
     disableRawMode();
@@ -631,6 +844,9 @@ switch (cmd || 'tui') {
     break;
   case 'backlog':
     cmdBacklog(args[0]);
+    break;
+  case 'doctor':
+    cmdDoctor();
     break;
   case 'tui':
     await cmdTui();

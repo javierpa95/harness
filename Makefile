@@ -3,7 +3,7 @@
 # Works on Linux, Mac, and Windows via Git Bash (make ships a POSIX shell there).
 # Native PowerShell without Git Bash: use init.ps1 / scripts/dev.ps1 directly instead of make.
 
-.PHONY: help init dev install build test lint format typecheck check docker-up docker-down docker-logs docker-restart docker-build docker-clean check-secrets agents models model tui update update-dry memory hooks audit review backend-test git-setup git-lint-commits git-lint-all ci-enable ci-enable-basic ci-enable-advanced ci-disable ci-status design-lint design-export-tailwind design-export-dtcg design-ref clean
+.PHONY: help init dev install build test lint format typecheck check docker-up docker-down docker-logs docker-restart docker-build docker-clean check-secrets agents models model tui update update-dry doctor memory hooks audit review backend-test git-setup git-lint-commits git-lint-all ci-enable ci-enable-basic ci-enable-advanced ci-disable ci-status design-lint design-export-tailwind design-export-dtcg design-ref clean
 
 # ==========================================
 # Variables — Agent fills these in after init
@@ -183,6 +183,9 @@ update: ## Update harness files from the template: make update TEMPLATE=<ruta> (
 
 update-dry: ## Preview what update would do, without writing
 	@node .opencode/scripts/harness-update.mjs --template "$(TEMPLATE)" --dry $(RESTORE)
+
+doctor: ## Audit agent health (permissions, memory, models, config)
+	@node .opencode/scripts/harness.mjs doctor
 
 memory: ## Show agent memory status
 	@echo "Agent Memory:"

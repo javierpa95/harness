@@ -32,7 +32,7 @@ Prioridad propuesta: 🔥 alto | 🧊 medio | ❄️ algún día
       — parcial: el prompt ya lista proveedores auth y modelos declarados; falta catalogo completo
 - [ ] 🧊 Catalogo completo de modelos via https://models.dev/api.json con cache local 24h
 - [x] Backlog de PROYECTO (docs/BACKLOG.md) creado y cableado a AGENTS.md, /start y vista Backlog del TUI (toggle 'b') (2026-08-25)
-- [ ] 🧊 Vista "auditoría": permisos efectivos por agente (merge global+agente) renderizados
+- [x] Vista "auditoría" + comando `make doctor`: permisos efectivos por agente y checks de salud (memoria escribible, read:'allow' traidor, formato de model, default_agent válido, tools deprecado) con prueba bug-inyectado/limpio (2026-08-25)
 - [ ] 🧊 Toggle on/off de agentes por stack (equivalente visual a borrar el .md, reversible)
 - [ ] 🧊 Editor de permisos por agente (whitelist de rutas editables) con preview del diff
 - [ ] 🧊 Gestor de MCP servers (enable/disable sin editar jsonc a mano)
